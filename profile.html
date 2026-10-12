@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0d0f16">
+  <link rel="icon" href="squadup-logo.svg" type="image/svg+xml">
+  <title>Your player profile · SquadUp</title>
+  <style>
+    :root{color-scheme:dark;--bg:#0d0f16;--panel:#161925;--panel-2:#10121b;--text:#f4f3ff;--muted:#a3a5b8;--line:#2a2d3b;--accent:#8b73ff}
+    *{box-sizing:border-box}
+    body{min-height:100vh;margin:0;background:radial-gradient(ellipse at 20% 0%,rgba(139,115,255,.16),transparent 36%),var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+    a{color:#c4b8ff}
+    .top{height:68px;padding:0 max(22px,calc((100vw - 1000px)/2));display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.08);background:rgba(13,15,22,.86)}
+    .brand{display:flex;align-items:center;gap:9px;color:var(--text);font-size:20px;font-weight:850;text-decoration:none;letter-spacing:-.04em}
+    .brand img{width:32px;height:32px}
+    .brand span{color:var(--accent)}
+    main{width:min(900px,100%);margin:auto;padding:38px 20px 60px}
+    .eyebrow{color:#c4b8ff;font-size:11px;font-weight:750;letter-spacing:.14em;text-transform:uppercase}
+    h1{margin:8px 0;font-size:clamp(30px,5vw,42px);letter-spacing:-.05em}
+    .intro{margin:0;color:var(--muted);font-size:14px;line-height:1.6}
+    .card{margin-top:24px;padding:26px;border:1px solid var(--line);border-radius:18px;background:var(--panel);box-shadow:0 24px 70px rgba(0,0,0,.25)}
+    .identity{display:flex;align-items:center;gap:20px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+    .avatar{width:112px;height:112px;flex:none;display:grid;place-items:center;overflow:hidden;border:2px solid rgba(139,115,255,.55);border-radius:50%;background:linear-gradient(145deg,#765cff,#d14bc0);color:#fff;font-size:30px;font-weight:850}
+    .avatar img{width:100%;height:100%;object-fit:cover}
+    .upload{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+    .upload label,.remove{padding:9px 12px;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);color:var(--text);font:inherit;font-size:12px;cursor:pointer}
+    .upload input{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+    .upload input:focus-visible+label{outline:2px solid var(--accent);outline-offset:2px}
+    .hint{margin:8px 0 0;color:var(--muted);font-size:12px}
+    .rank-note{margin:6px 0 0;color:#c4b8ff;font-size:11px;font-weight:500}
+    .fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:22px}
+    .fields label{display:grid;gap:7px;font-size:12px;font-weight:700}
+    .fields .wide{grid-column:1/-1}
+    input,select,textarea{width:100%;min-height:44px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel-2);color:var(--text);font:inherit;font-size:14px}
+    textarea{min-height:90px;resize:vertical}
+    input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(139,115,255,.16)}
+    .notice{min-height:20px;color:#ded7ff;font-size:13px;line-height:1.5}
+    .actions{display:flex;flex-wrap:wrap;gap:10px}
+    .actions button{min-height:46px;padding:0 17px;border:0;border-radius:10px;background:linear-gradient(110deg,#795cff,#a353dc);color:white;font:inherit;font-weight:750;cursor:pointer}
+    .actions button.secondary{border:1px solid var(--line);background:var(--panel-2);color:var(--text)}
+    .actions button.danger{border:1px solid rgba(248,113,113,.4);background:transparent;color:#fca5a5}
+    button:disabled{opacity:.55;cursor:wait}
+    @media(max-width:600px){.top{height:60px;padding:0 14px}main{padding:26px 14px 40px}.card{padding:19px}.identity{align-items:flex-start;flex-direction:column}.avatar{width:92px;height:92px}.fields{grid-template-columns:1fr}.fields .wide{grid-column:auto}}
+  </style>
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="SquadUp – Find your squad.html"><img src="squadup-logo.svg" alt=""><span>SquadUp</span></a>
+    <a href="SquadUp – Find your squad.html">Skip for now</a>
+  </header>
+  <main>
+    <div class="eyebrow">Your player card</div>
+    <h1>Build your character profile</h1>
+    <p class="intro">Add a picture and a few details for your local demo profile. This demo stores your information only in this browser; do not add sensitive personal details.</p>
+    <form class="card" id="profile-form">
+      <section class="identity" aria-label="Profile picture">
+        <div class="avatar" id="avatar"><span id="avatar-initials">?</span><img id="avatar-image" alt="Your profile picture" hidden></div>
+        <div>
+          <div class="upload">
+            <input id="avatar-file" type="file" accept="image/jpeg,image/png,image/webp">
+            <label for="avatar-file">Upload a picture</label>
+            <button class="remove" id="remove-avatar" type="button">Remove picture</button>
+          </div>
+          <p class="hint">JPG, PNG, or WebP. Your picture stays in this browser.</p>
+        </div>
+      </section>
+      <div class="fields">
+        <label>Gamer tag<input id="gamer-tag" maxlength="20" autocomplete="nickname" required></label>
+        <label>Platform<select id="platform"><option>PlayStation</option><option>Xbox</option><option>PC</option><option>Mobile</option></select></label>
+        <label>Favorite game<select id="game"></select></label>
+        <label>Assigned rank<select id="rank" disabled><option>Bronze</option><option>Silver</option><option>Gold</option><option>Platinum</option><option>Diamond</option><option>Elite</option></select><span class="rank-note">Randomly assigned when your local account is created.</span></label>
+        <label>Region<input id="region" maxlength="30" placeholder="e.g. Lagos, Europe"></label>
+        <label>Mic preference<select id="mic"><option>Mic on</option><option>Mic optional</option><option>No mic</option></select></label>
+        <label>Play style<select id="skill"><option>Casual</option><option>Competitive</option><option>Hardcore</option><option>Social</option></select></label>
+        <label class="wide">About you<textarea id="bio" maxlength="120" placeholder="Your play style, vibe, and when you like to play"></textarea></label>
+      </div>
+      <p class="notice" id="notice" role="status" aria-live="polite"></p>
+      <div class="actions">
+        <button id="save" type="submit">Save profile and continue</button>
+        <button class="secondary" id="logout" type="button">Log out</button>
+        <button class="danger" id="delete-account" type="button">Delete local account</button>
+      </div>
+      <p class="hint">Deleting your local account also removes its demo requests, squad memberships, and messages from this browser. This cannot be undone.</p>
+    </form>
+  </main>
+  <script src="local-auth.js"></script>
+  <script>
+    const auth = window.SquadUpLocalAuth;
+    const account = auth.getSession();
+    if (!account) {
+      location.replace("login.html?next=profile.html");
+    } else {
+      const profile = auth.getProfile() || {};
+      const params = new URLSearchParams(location.search);
+      const games = ["Call of Duty","Call of Duty Mobile","Valorant","Counter-Strike 2","Apex Legends","Fortnite","PUBG Mobile","Free Fire","EA FC 27","eFootball","NBA 2K","Dream League Soccer","Rocket League","League of Legends","Mobile Legends","Tekken 8","Minecraft","Roblox","GTA Online","Clash Royale","Other game"];
+      const gameSelect = document.getElementById("game");
+      gameSelect.innerHTML = games.map(game => `<option>${game}</option>`).join("");
+      document.getElementById("gamer-tag").value = profile.tag || account.gamerTag;
+      document.getElementById("platform").value = profile.platform || "PC";
+      document.getElementById("game").value = profile.favoriteGame || "Valorant";
+      document.getElementById("rank").value = profile.rank || "Gold";
+      document.getElementById("region").value = profile.region || "";
+      document.getElementById("mic").value = profile.mic || "Mic on";
+      document.getElementById("skill").value = profile.skill || "Casual";
+      document.getElementById("bio").value = profile.bio || "";
+      let avatarData = profile.avatar || "";
+
+      function renderAvatar() {
+        const name = document.getElementById("gamer-tag").value.trim() || "?";
+        document.getElementById("avatar-initials").textContent = name.slice(0, 2).toUpperCase();
+        const image = document.getElementById("avatar-image");
+        image.hidden = !avatarData;
+        image.src = avatarData;
+      }
+      renderAvatar();
+      document.getElementById("gamer-tag").addEventListener("input", renderAvatar);
+      document.getElementById("avatar-file").addEventListener("change", event => {
+        const file = event.currentTarget.files[0];
+        if (!file) return;
+        if (!["image/jpeg","image/png","image/webp"].includes(file.type) || file.size > 5 * 1024 * 1024) {
+          event.currentTarget.value = "";
+          document.getElementById("notice").textContent = "Choose a JPG, PNG, or WebP image smaller than 5 MB.";
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = () => {
+          const source = new Image();
+          source.onload = () => {
+            const scale = Math.min(1, 320 / Math.max(source.width, source.height));
+            const canvas = document.createElement("canvas");
+            canvas.width = Math.max(1, Math.round(source.width * scale));
+            canvas.height = Math.max(1, Math.round(source.height * scale));
+            canvas.getContext("2d").drawImage(source, 0, 0, canvas.width, canvas.height);
+            avatarData = canvas.toDataURL("image/jpeg", 0.82);
+            renderAvatar();
+            document.getElementById("notice").textContent = "";
+          };
+          source.onerror = () => {
+            document.getElementById("notice").textContent = "That image could not be opened. Try a different picture.";
+          };
+          source.src = reader.result;
+        };
+        reader.onerror = () => {
+          document.getElementById("notice").textContent = "Could not read the selected picture.";
+        };
+        reader.readAsDataURL(file);
+      });
+      document.getElementById("remove-avatar").addEventListener("click", () => {
+        avatarData = "";
+        document.getElementById("avatar-file").value = "";
+        renderAvatar();
+      });
+      document.getElementById("profile-form").addEventListener("submit", event => {
+        event.preventDefault();
+        const button = document.getElementById("save");
+        button.disabled = true;
+        try {
+          auth.saveProfile({
+            tag: document.getElementById("gamer-tag").value.trim(),
+            avatar: avatarData,
+            platform: document.getElementById("platform").value,
+            favoriteGame: document.getElementById("game").value,
+            rank: document.getElementById("rank").value,
+            region: document.getElementById("region").value.trim(),
+            mic: document.getElementById("mic").value,
+            skill: document.getElementById("skill").value,
+            bio: document.getElementById("bio").value.trim()
+          });
+          const target = params.get("next") === "messages.html" ? new URL("messages.html", location.href) : new URL("SquadUp – Find your squad.html", location.href);
+          if (params.get("next") === "messages.html") {
+            for (const key of ["to","name"]) {
+              const value = params.get(key);
+              if (value) target.searchParams.set(key, value);
+            }
+          } else {
+            target.hash = "profile";
+          }
+          location.href = target.href;
+        } catch (error) {
+          document.getElementById("notice").textContent = error.message || "Could not save your profile.";
+        } finally {
+          button.disabled = false;
+        }
+      });
+      document.getElementById("logout").addEventListener("click", () => {
+        auth.signOut();
+        location.href = "login.html";
+      });
+      document.getElementById("delete-account").addEventListener("click", () => {
+        if (!window.confirm(`Delete the local account "${account.gamerTag}" and its demo data? This cannot be undone.`)) return;
+        const button = document.getElementById("delete-account");
+        button.disabled = true;
+        try {
+          auth.deleteAccount();
+          location.replace("signup.html");
+        } catch (error) {
+          document.getElementById("notice").textContent = error.message || "Could not delete this local account.";
+          button.disabled = false;
+        }
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#11121a">
+  <link rel="icon" href="squadup-logo.svg" type="image/svg+xml">
+  <title>Messages · SquadUp</title>
+  <style>
+    :root{color-scheme:dark;--bg:#0d0f16;--panel:#161925;--panel-2:#11141e;--text:#f4f3ff;--muted:#979bb0;--line:#292c3b;--accent:#8b73ff;--pink:#ec4899}
+    *{box-sizing:border-box}
+    body{min-height:100vh;margin:0;background:radial-gradient(ellipse at 20% 0%,rgba(139,115,255,.13),transparent 34%),var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+    a{color:inherit;text-decoration:none}
+    button,input{font:inherit;color:inherit}
+    .top{height:68px;padding:0 max(22px,calc((100vw - 1200px)/2));display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.08);background:rgba(13,15,22,.82);backdrop-filter:blur(14px)}
+    .top-actions{display:flex;align-items:center;gap:14px}
+    .top input{width:180px;height:36px;padding:0 10px;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);font-size:12px}
+    .top input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(139,115,255,.15)}
+    .brand{display:inline-flex;align-items:center;gap:8px;font-size:21px;font-weight:850;letter-spacing:-1px}.brand span{color:var(--accent)}.brand img{width:32px;height:32px;filter:drop-shadow(0 3px 8px rgba(139,115,255,.35))}.brand .wordmark-pad{width:24px;height:17px;margin:0 -5px;object-fit:contain}
+    .back{color:var(--muted);font-size:14px}.back:hover{color:white}
+    main{width:min(1200px,100%);margin:auto;padding:30px 22px 48px}
+    .heading{display:flex;justify-content:space-between;align-items:end;gap:16px;margin-bottom:20px}
+    .eyebrow{color:#c4b8ff;font-size:11px;font-weight:750;letter-spacing:.14em;text-transform:uppercase}
+    h1{margin:7px 0 0;font-size:clamp(28px,4vw,38px);letter-spacing:-.045em}
+    .status{max-width:430px;padding:9px 12px;border:1px solid rgba(139,115,255,.22);border-radius:10px;background:rgba(139,115,255,.07);color:#c5c2d8;font-size:12px;line-height:1.5}
+    .messenger{height:min(680px,calc(100vh - 190px));min-height:480px;display:grid;grid-template-columns:310px 1fr;overflow:hidden;border:1px solid var(--line);border-radius:18px;background:var(--panel);box-shadow:0 28px 90px rgba(0,0,0,.28);animation:enter .45s ease both}
+    .sidebar{min-width:0;display:flex;flex-direction:column;border-right:1px solid var(--line);background:rgba(10,12,19,.35)}
+    .side-head{padding:19px 17px 14px;border-bottom:1px solid var(--line)}
+    .side-head h2{margin:0 0 13px;font-size:15px}
+    .search{width:100%;height:39px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel-2);font-size:13px}
+    .search:focus,.composer input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(139,115,255,.15)}
+    .contact-list{flex:1;overflow:auto;padding:7px}
+    .contact{width:100%;display:flex;gap:11px;align-items:center;padding:11px 10px;border:0;border-radius:12px;background:transparent;text-align:left;cursor:pointer;transition:background .16s,transform .16s}
+    .contact:hover{background:rgba(255,255,255,.055);transform:translateX(2px)}
+    .contact.active{background:rgba(139,115,255,.15)}
+    .avatar{flex:none;width:40px;height:40px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.1);border-radius:50%;background:linear-gradient(145deg,#765cff,#d14bc0);font-size:13px;font-weight:800}
+    .contact-copy{min-width:0;flex:1}
+    .contact-name{display:block;overflow:hidden;font-size:13px;font-weight:700;text-overflow:ellipsis;white-space:nowrap}
+    .preview{display:block;overflow:hidden;margin-top:4px;color:var(--muted);font-size:11px;text-overflow:ellipsis;white-space:nowrap}
+    .unread{flex:none;min-width:20px;padding:3px 6px;border-radius:999px;background:var(--accent);color:#fff;text-align:center;font-size:10px;font-weight:800}
+    .top-actions button{padding:7px 10px;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);font-size:12px;cursor:pointer}
+    .empty-contacts{padding:18px 12px;color:var(--muted);font-size:12px;line-height:1.6}
+    .conversation{min-width:0;display:grid;grid-template-rows:auto 1fr auto}
+    .conv-head{min-height:72px;padding:13px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line)}
+    .conv-name{font-size:14px;font-weight:750}.conv-sub{margin-top:4px;color:var(--muted);font-size:11px}
+    .feed{overflow:auto;padding:22px;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth}
+    .welcome{margin:auto;max-width:360px;text-align:center;color:var(--muted);font-size:13px;line-height:1.7}
+    .welcome strong{display:block;margin-bottom:6px;color:var(--text);font-size:16px}
+    .message{max-width:min(75%,520px);padding:10px 13px;border:1px solid var(--line);border-radius:14px 14px 14px 4px;background:#202331;overflow-wrap:anywhere;animation:enter .2s ease both}
+    .message.mine{align-self:flex-end;border-color:transparent;border-radius:14px 14px 4px 14px;background:linear-gradient(135deg,#755bff,#965bde)}
+    .message-text{font-size:13px;line-height:1.5;white-space:pre-wrap}
+    .message-image{display:block;width:min(100%,360px);max-height:320px;margin-top:7px;border-radius:10px;object-fit:contain;background:rgba(0,0,0,.18)}
+    .message-audio{display:block;width:min(100%,300px);margin-top:7px}
+    .attachment-actions{display:flex;align-items:center;gap:8px;padding:10px 14px 0;border-top:1px solid var(--line);background:rgba(10,12,19,.28)}
+    .attachment-actions[hidden]{display:none}
+    .attach-button,.record-button,.remove-attachment{min-height:34px;padding:0 11px;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);font-size:12px;cursor:pointer}
+    .record-button.recording{border-color:#ef4444;background:rgba(239,68,68,.16);color:#fecaca}
+    .record-button:disabled,.attach-button:disabled{cursor:not-allowed;opacity:.5}
+    .attachment-preview{min-width:0;flex:1;overflow:hidden;color:var(--muted);font-size:12px;text-overflow:ellipsis;white-space:nowrap}
+    .remove-attachment{color:#fca5a5}
+    .composer{border-top:0}
+    .time{margin-top:5px;color:#c0bfd0;font-size:10px}
+    .composer{display:flex;gap:10px;padding:10px 18px 14px;background:rgba(10,12,19,.28)}
+    .composer input{min-width:0;flex:1;height:44px;padding:0 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel-2);font-size:13px}
+    .send{flex:none;padding:0 18px;border:0;border-radius:12px;background:linear-gradient(110deg,#795cff,#a353dc);font-weight:750;cursor:pointer;transition:filter .16s,transform .16s}
+    .send:hover{filter:brightness(1.13);transform:translateY(-1px)}.send:active{transform:scale(.98)}
+    .send:disabled,.composer input:disabled{cursor:not-allowed;opacity:.5}
+    .mobile-back{display:none;padding:6px 9px;border:1px solid var(--line);border-radius:9px;background:transparent;cursor:pointer}
+    @keyframes enter{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    @media(max-width:700px){
+      .top{height:60px;padding:0 16px}
+      .top input{width:130px}
+      .top-actions{gap:9px}
+      .back{font-size:12px}
+      main{padding:22px 12px 28px}
+      .heading{align-items:start;flex-direction:column;margin-bottom:14px}
+      .status{max-width:none}
+      .messenger{height:calc(100dvh - 200px);min-height:420px;grid-template-columns:1fr}
+      .sidebar,.conversation{grid-row:1;grid-column:1}
+      .messenger.show-conversation .sidebar{display:none}
+      .messenger:not(.show-conversation) .conversation{display:none}
+      .mobile-back{display:block}
+      .conv-head{padding:12px}
+      .feed{padding:16px}
+      .attachment-actions{flex-wrap:wrap;padding:10px 11px 0}
+      .attachment-preview{order:1;flex-basis:100%}
+      .composer{padding:11px}
+      .send{padding:0 14px}
+    }
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+  </style>
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="SquadUp – Find your squad.html" aria-label="SquadUp home"><img src="squadup-logo.svg" alt=""><span>Squad</span><img class="wordmark-pad" src="squadup-gamepad.svg" alt="" aria-hidden="true"><span>Up</span></a>
+    <div class="top-actions"><input id="gamer-tag" type="text" maxlength="20" placeholder="Your gamer tag" aria-label="Your gamer tag" readonly><button id="logout" type="button">Log out</button><a class="back" href="SquadUp – Find your squad.html">← Find players</a></div>
+  </header>
+  <main>
+    <div class="heading">
+      <div><div class="eyebrow">SquadUp inbox</div><h1>Messages</h1></div>
+      <div class="status" id="status" role="status">Loading your conversations…</div>
+    </div>
+    <section class="messenger" id="messenger" aria-label="Direct messages">
+      <aside class="sidebar" aria-label="Players">
+        <div class="side-head"><h2>Players</h2><input class="search" id="search" type="search" placeholder="Search players…" aria-label="Search players"></div>
+        <div class="contact-list" id="contacts"></div>
+      </aside>
+      <section class="conversation" aria-label="Conversation">
+        <header class="conv-head">
+          <button class="mobile-back" id="mobile-back" type="button" aria-label="Back to player list">←</button>
+          <div class="avatar" id="active-avatar">?</div>
+          <div><div class="conv-name" id="active-name">Choose a player</div><div class="conv-sub" id="active-sub">Start a conversation</div></div>
+        </header>
+        <div class="feed" id="feed" aria-live="polite"><div class="welcome"><strong>Your squad starts with a hello.</strong>Choose a player who has posted a request to start a conversation.</div></div>
+        <div class="attachment-actions" id="attachment-actions" hidden>
+          <input id="photo-file" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+          <button class="attach-button" id="choose-photo" type="button" disabled>Photo</button>
+          <button class="record-button" id="record-voice" type="button" disabled>Record voice note</button>
+          <span class="attachment-preview" id="attachment-preview" aria-live="polite">Photos and voice notes stay in this browser.</span>
+          <button class="remove-attachment" id="remove-attachment" type="button" hidden>Remove</button>
+        </div>
+        <form class="composer" id="composer">
+          <input id="message" type="text" maxlength="300" placeholder="Write a message…" autocomplete="off" aria-label="Write a message" disabled>
+          <button class="send" id="send" type="submit" disabled>Send</button>
+        </form>
+      </section>
+    </section>
+  </main>
+  <script src="local-auth.js"></script>
+  <script>if(false){
+    const $=id=>document.getElementById(id);
+    const esc=value=>String(value==null?"":value).replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
+    const load=(key,fallback)=>{try{return JSON.parse(localStorage.getItem(key))||fallback}catch{return fallback}};
+    const save=(key,value)=>{try{localStorage.setItem(key,JSON.stringify(value));return true}catch{return false}};
+    const params=new URLSearchParams(location.search);
+    let uid=load("sq2_uid","");
+    if(!uid){uid="g_"+Math.random().toString(36).slice(2,10);save("sq2_uid",uid)}
+    let gamerTag=load("sq2_name","");
+    $("gamer-tag").value=gamerTag;
+    let contacts=new Map();
+    let selected="";
+    let conversations=load("sq2_direct_messages",[]);
+    if(!Array.isArray(conversations))conversations=[];
+
+    function dmKey(peer){return [uid,peer].sort().join("|")}
+    function collectContacts(){
+      const posts=load("sq2_posts",[]);
+      const members=load("sq2_members",[]);
+      for(const post of posts){
+        if(post.uid&&post.uid!==uid)contacts.set(post.uid,{id:post.uid,name:post.u||"Squad player",game:post.g||""});
+      }
+      for(const member of members){
+        if(member.uid&&member.uid!==uid)contacts.set(member.uid,{id:member.uid,name:member.name||"Squad player",game:"Squad member"});
+      }
+      for(const message of conversations){
+        if(message.peer&&message.peer!==uid&&!contacts.has(message.peer))contacts.set(message.peer,{id:message.peer,name:message.peerName||"Squad player",game:""});
+      }
+      const requested=params.get("to");
+      if(requested&&requested!==uid&&!contacts.has(requested))contacts.set(requested,{id:requested,name:params.get("name")||"Squad player",game:""});
+      renderContacts();
+      if(requested&&requested!==uid)selectContact(requested);
+    }
+    function previewFor(peer){
+      const latest=conversations.filter(message=>message.key===dmKey(peer)).sort((a,b)=>a.ts-b.ts).at(-1);
+      return latest?latest.text:"Start a conversation";
+    }
+    function renderContacts(){
+      const query=$("search").value.trim().toLowerCase();
+      const list=[...contacts.values()].filter(person=>person.name.toLowerCase().includes(query)||person.game.toLowerCase().includes(query));
+        list.sort((a,b)=>{
+          const aLatest=Math.max(0,...conversations.filter(message=>message.key===dmKey(a.id)).map(message=>message.ts));
+          const bLatest=Math.max(0,...conversations.filter(message=>message.key===dmKey(b.id)).map(message=>message.ts));
+          return bLatest-aLatest||a.name.localeCompare(b.name);
+        });
+        $("contacts").innerHTML=list.length?list.map(person=>`<button class="contact ${person.id===selected?"active":""}" type="button" data-peer="${esc(person.id)}"><span class="avatar">${esc(person.name.slice(0,2).toUpperCase())}</span><span class="contact-copy"><span class="contact-name">${esc(person.name)}</span><span class="preview">${esc(previewFor(person.id))}</span></span></button>`).join(""):'<div class="empty-contacts">No players found yet. Browse open squad requests and choose <b>Message player</b> to start a chat.</div>';
+      }
+    function selectContact(peer){
+      const person=contacts.get(peer);
+      if(!person)return;
+      selected=peer;
+      $("messenger").classList.add("show-conversation");
+      $("active-name").textContent=person.name;
+      $("active-avatar").textContent=person.name.slice(0,2).toUpperCase();
+      $("active-sub").textContent=person.game?`Player · ${person.game}`:"SquadUp player";
+      $("message").disabled=false;
+      $("send").disabled=false;
+      renderContacts();
+      renderMessages();
+      $("message").focus();
+    }
+    function renderMessages(){
+      const items=conversations.filter(message=>message.key===dmKey(selected)).sort((a,b)=>a.ts-b.ts);
+      $("feed").innerHTML=items.length?items.map(message=>`<div class="message ${message.from===uid?"mine":""}"><div class="message-text">${esc(message.text)}</div><div class="time">${message.from===uid?"You":esc(message.fromName||"Player")} · ${new Date(message.ts).toLocaleTimeString([],{hour:"numeric",minute:"2-digit"})}</div></div>`).join(""):'<div class="welcome"><strong>Say hello to '+esc(contacts.get(selected)?.name||"your new teammate")+'.</strong>Keep it friendly and never share passwords or sensitive personal information.</div>';
+      $("feed").scrollTop=$("feed").scrollHeight;
+    }
+    $("contacts").addEventListener("click",event=>{
+      const button=event.target.closest("[data-peer]");
+      if(button)selectContact(button.dataset.peer);
+    });
+    $("gamer-tag").addEventListener("input",event=>{
+      gamerTag=event.currentTarget.value.trim();
+      if(gamerTag)save("sq2_name",gamerTag);else localStorage.removeItem("sq2_name");
+    });
+    $("search").addEventListener("input",renderContacts);
+    $("mobile-back").addEventListener("click",()=>$("messenger").classList.remove("show-conversation"));
+    $("composer").addEventListener("submit",event=>{
+      event.preventDefault();
+      const text=$("message").value.trim();
+      if(!selected||!text)return;
+      if(!gamerTag){$("status").textContent="Enter your gamer tag at the top of the page before sending."; $("gamer-tag").focus();return}
+      conversations.push({key:dmKey(selected),peer:selected,peerName:contacts.get(selected).name,from:uid,fromName:gamerTag,text,ts:Date.now()});
+      conversations=conversations.slice(-500);
+      if(!save("sq2_direct_messages",conversations)){
+        conversations.pop();
+        $("status").textContent="Could not save this message in browser storage.";
+        return;
+      }
+      $("message").value="";
+      $("status").textContent="Demo inbox: messages are saved only in this browser. Shared player messaging needs a connected, secured account service.";
+      renderMessages();
+      renderContacts();
+    });
+    function initialize(){
+      $("status").textContent="Demo inbox: messages are saved only in this browser. Shared player messaging needs a connected, secured account service.";
+      collectContacts();
+    }
+    initialize();
+  }</script>
+  <script>
+    const $=id=>document.getElementById(id);
+    const esc=value=>String(value==null?"":value).replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
+    const client=window.squadUpSupabase;
+    const params=new URLSearchParams(location.search);
+    let uid="",selected="",profiles=new Map(),messages=[],channel=null,searchTimer=0,localMode=false,notifiedMessageIds=new Set(),pendingAttachment=null,mediaRecorder=null,recordingStream=null,recordingChunks=[],recordingTimer=0,recordingSeconds=0;
+    function setStatus(message){$("status").textContent=message}
+    function messageTime(value){return new Date(value).toLocaleTimeString([],{hour:"numeric",minute:"2-digit"})}
+    function selectedMessages(peer){return messages.filter(item=>(item.sender_id===uid&&item.recipient_id===peer)||(item.sender_id===peer&&item.recipient_id===uid))}
+    function latestMessage(peer){return selectedMessages(peer).at(-1)}
+    function unreadCount(peer){return messages.filter(item=>item.sender_id===peer&&item.recipient_id===uid&&!item.read_at).length}
+    function attachmentPreview(message){return message.body|| (message.attachment?.type==="image"?"Photo":message.attachment?.type==="audio"?"Voice note":"")}
+    function clearAttachment(){
+      pendingAttachment=null;
+      $("photo-file").value="";
+      $("remove-attachment").hidden=true;
+      updateSendButton();
+    }
+    function showPendingAttachment(attachment){
+      pendingAttachment=attachment;
+      $("attachment-preview").textContent=`${attachment.type==="image"?"Photo":"Voice note"} attached: ${attachment.name}`;
+      $("remove-attachment").hidden=false;
+      updateSendButton();
+    }
+    function updateSendButton(){$("send").disabled=!selected||!!mediaRecorder||(!$("message").value.trim()&&!pendingAttachment)}
+    function updateAttachmentControls(){
+      const supported=localMode&&!!selected;
+      $("attachment-actions").hidden=!selected;
+      $("choose-photo").disabled=!supported||!!mediaRecorder;
+      $("record-voice").disabled=!supported;
+      if(pendingAttachment){
+        $("attachment-preview").textContent=`${pendingAttachment.type==="image"?"Photo":"Voice note"} attached: ${pendingAttachment.name}`;
+        $("remove-attachment").hidden=false;
+      }else{
+        $("attachment-preview").textContent=supported?"Photos and voice notes stay in this browser.":"Attachments are only available in browser-local chats.";
+        $("remove-attachment").hidden=true;
+      }
+      updateSendButton();
+    }
+    function renderAttachment(attachment){
+      if(!attachment?.dataUrl)return"";
+      const source=esc(attachment.dataUrl);
+      if(attachment.type==="image")return`<img class="message-image" src="${source}" alt="Photo attachment" loading="lazy">`;
+      if(attachment.type==="audio")return`<audio class="message-audio" controls preload="metadata" src="${source}">Your browser cannot play this voice note.</audio>`;
+      return"";
+    }
+    function renderContacts(){
+      const query=$("search").value.trim().toLowerCase();
+      const list=[...profiles.values()].filter(profile=>profile.gamer_tag.toLowerCase().includes(query));
+      list.sort((a,b)=>{
+        const aMessage=latestMessage(a.id),bMessage=latestMessage(b.id);
+        return (Date.parse(bMessage?.created_at||"")||0)-(Date.parse(aMessage?.created_at||"")||0)||a.gamer_tag.localeCompare(b.gamer_tag);
+      });
+      $("contacts").innerHTML=list.length?list.map(profile=>{
+        const preview=latestMessage(profile.id);
+        const unread=unreadCount(profile.id);
+        return `<button class="contact ${profile.id===selected?"active":""}" type="button" data-peer="${esc(profile.id)}"><span class="avatar">${esc(profile.gamer_tag.slice(0,2).toUpperCase())}</span><span class="contact-copy"><span class="contact-name">${esc(profile.gamer_tag)}</span><span class="preview">${esc(preview?attachmentPreview(preview):"Start a conversation")}</span></span>${unread?`<span class="unread" aria-label="${unread} unread messages">${unread>9?"9+":unread}</span>`:""}</button>`;
+      }).join(""):'<div class="empty-contacts">No players found. Search by gamer tag, or invite a friend to create an account.</div>';
+    }
+    function renderConversation(){
+      const profile=profiles.get(selected);
+      if(!profile){
+        $("active-name").textContent="Choose a player";
+        $("active-avatar").textContent="?";
+        $("active-sub").textContent="Start a conversation";
+        $("feed").innerHTML='<div class="welcome"><strong>Your squad starts with a hello.</strong>Choose a player to start a direct conversation.</div>';
+        $("message").disabled=true;
+        $("send").disabled=true;
+        updateAttachmentControls();
+        return;
+      }
+      $("active-name").textContent=profile.gamer_tag;
+      $("active-avatar").textContent=profile.gamer_tag.slice(0,2).toUpperCase();
+      $("active-sub").textContent=[profile.game,profile.platform,profile.region].filter(Boolean).join(" · ")||"SquadUp player";
+      const items=selectedMessages(selected);
+      $("feed").innerHTML=items.length?items.map(item=>`<div class="message ${item.sender_id===uid?"mine":""}">${item.body?`<div class="message-text">${esc(item.body)}</div>`:""}${renderAttachment(item.attachment)}<div class="time">${item.sender_id===uid?"You":esc(profile.gamer_tag)} · ${messageTime(item.created_at)}${item.sender_id===uid&&item.read_at?" · Read":""}</div></div>`).join(""):'<div class="welcome"><strong>Say hello to '+esc(profile.gamer_tag)+'.</strong>Keep it friendly and never share passwords or sensitive personal information.</div>';
+      $("feed").scrollTop=$("feed").scrollHeight;
+      $("message").disabled=false;
+      $("send").disabled=false;
+      updateAttachmentControls();
+    }
+    function render(){
+      renderContacts();
+      renderConversation();
+    }
+    async function loadProfiles(query=""){
+      if(localMode){
+        profiles=new Map(window.SquadUpLocalAuth.getPlayers(query).map(profile=>[profile.id,profile]));
+        const requested=params.get("to");
+        if(requested&&requested!==uid&&!profiles.has(requested)){
+          const person=window.SquadUpLocalAuth.getPlayers().find(profile=>profile.id===requested);
+          if(person)profiles.set(person.id,person);
+        }
+        render();
+        if(requested&&requested!==uid&&profiles.has(requested))await selectContact(requested);
+        return;
+      }
+      if(!client||!uid)return;
+      let request=client.from("profiles").select("id,gamer_tag,game,platform,region").neq("id",uid).order("gamer_tag").limit(100);
+      if(query)request=request.ilike("gamer_tag",`%${query}%`);
+      const {data,error}=await request;
+      if(error){setStatus("Could not load players: "+error.message);return}
+      profiles=new Map((data||[]).map(profile=>[profile.id,profile]));
+      const requested=params.get("to");
+      if(requested&&requested!==uid&&!profiles.has(requested)){
+        const {data:person,error:profileError}=await client.from("profiles").select("id,gamer_tag,game,platform,region").eq("id",requested).maybeSingle();
+        if(profileError)setStatus("Could not load requested player: "+profileError.message);
+        else if(person)profiles.set(person.id,person);
+      }
+      render();
+      if(requested&&requested!==uid&&profiles.has(requested))selectContact(requested);
+    }
+    async function refreshMessages(){
+      if(localMode){
+        messages=window.SquadUpLocalAuth.getMessages();
+        render();
+        const incoming=messages.filter(message=>message.recipient_id===uid);
+        for(const item of incoming)notifiedMessageIds.add(item.id);
+        return;
+      }
+      const {data,error}=await client.from("direct_messages").select("id,sender_id,recipient_id,body,created_at,read_at").or(`sender_id.eq.${uid},recipient_id.eq.${uid}`).order("created_at",{ascending:true}).limit(500);
+      if(error){setStatus("Could not load messages: "+error.message);return}
+      messages=data||[];
+      render();
+    }
+    async function selectContact(peer){
+      if(!profiles.has(peer))return;
+      if(mediaRecorder){setStatus("Stop the voice recording before changing conversations.");return}
+      if(selected!==peer&&pendingAttachment)clearAttachment();
+      selected=peer;
+      $("messenger").classList.add("show-conversation");
+      render();
+      if(localMode){
+        window.SquadUpLocalAuth.markMessagesRead(peer);
+        await refreshMessages();
+        $("message").focus();
+        return;
+      }
+      const {error}=await client.from("direct_messages").update({read_at:new Date().toISOString()}).eq("sender_id",peer).eq("recipient_id",uid).is("read_at",null);
+      if(error){setStatus("Could not mark messages as read: "+error.message);return}
+      await refreshMessages();
+      $("message").focus();
+    }
+    function fileAsDataUrl(blob,onloadError){
+      const reader=new FileReader();
+      reader.onload=()=>typeof reader.result==="string"?showPendingAttachment({
+        type:"audio",name:`Voice note (${recordingSeconds}s)`,mime:blob.type,dataUrl:reader.result
+      }):setStatus("Could not prepare the voice note.");
+      reader.onerror=()=>setStatus(onloadError);
+      reader.readAsDataURL(blob);
+    }
+    $("choose-photo").addEventListener("click",()=>$("photo-file").click());
+    $("photo-file").addEventListener("change",event=>{
+      const file=event.currentTarget.files[0];
+      if(!file)return;
+      if(!["image/jpeg","image/png","image/webp"].includes(file.type)||file.size>5*1024*1024){
+        event.currentTarget.value="";
+        setStatus("Choose a JPG, PNG, or WebP photo smaller than 5 MB.");
+        return;
+      }
+      const reader=new FileReader();
+      reader.onerror=()=>setStatus("Could not read the selected photo.");
+      reader.onload=()=>{
+        const image=new Image();
+        image.onerror=()=>setStatus("That photo could not be opened. Try a different image.");
+        image.onload=()=>{
+          const scale=Math.min(1,1280/Math.max(image.width,image.height));
+          const canvas=document.createElement("canvas");
+          canvas.width=Math.max(1,Math.round(image.width*scale));
+          canvas.height=Math.max(1,Math.round(image.height*scale));
+          const context=canvas.getContext("2d");
+          if(!context){setStatus("Could not prepare this photo in your browser.");return}
+          context.drawImage(image,0,0,canvas.width,canvas.height);
+          canvas.toBlob(blob=>{
+            if(!blob){setStatus("Could not prepare this photo in your browser.");return}
+            if(blob.size>1024*1024){setStatus("This photo is still too large after resizing. Choose a smaller image.");return}
+            const dataReader=new FileReader();
+            dataReader.onerror=()=>setStatus("Could not prepare this photo for sending.");
+            dataReader.onload=()=>typeof dataReader.result==="string"?showPendingAttachment({
+              type:"image",name:file.name,mime:"image/jpeg",dataUrl:dataReader.result
+            }):setStatus("Could not prepare this photo for sending.");
+            dataReader.readAsDataURL(blob);
+          },"image/jpeg",0.82);
+        };
+        if(typeof reader.result==="string")image.src=reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+    $("remove-attachment").addEventListener("click",clearAttachment);
+    $("record-voice").addEventListener("click",async()=>{
+      if(mediaRecorder){
+        $("record-voice").disabled=true;
+        $("record-voice").textContent="Preparing note…";
+        clearInterval(recordingTimer);
+        if(mediaRecorder.state!=="inactive")mediaRecorder.stop();
+        return;
+      }
+      if(!navigator.mediaDevices?.getUserMedia||typeof MediaRecorder==="undefined"){
+        setStatus("Voice recording is not supported in this browser. Try opening SquadUp on localhost or HTTPS.");
+        return;
+      }
+      try{
+        recordingStream=await navigator.mediaDevices.getUserMedia({audio:true});
+        const mimeTypes=["audio/webm;codecs=opus","audio/ogg;codecs=opus","audio/mp4"];
+        const mimeType=mimeTypes.find(type=>MediaRecorder.isTypeSupported(type));
+        mediaRecorder=mimeType?new MediaRecorder(recordingStream,{mimeType}):new MediaRecorder(recordingStream);
+        recordingChunks=[];
+        recordingSeconds=0;
+        mediaRecorder.ondataavailable=event=>{if(event.data.size)recordingChunks.push(event.data)};
+        mediaRecorder.onerror=()=>setStatus("Voice recording failed. Check microphone access and try again.");
+        mediaRecorder.onstop=()=>{
+          const recorder=mediaRecorder;
+          mediaRecorder=null;
+          recordingStream?.getTracks().forEach(track=>track.stop());
+          recordingStream=null;
+          $("record-voice").classList.remove("recording");
+          $("record-voice").textContent="Record voice note";
+          updateAttachmentControls();
+          const blob=new Blob(recordingChunks,{type:recorder.mimeType||"audio/webm"});
+          recordingChunks=[];
+          if(blob.size>1024*1024){setStatus("Voice notes must be smaller than 1 MB. Record a shorter note and try again.");return}
+          if(blob.size===0){setStatus("The voice note was empty. Please record again.");return}
+          fileAsDataUrl(blob,"Could not prepare the voice note for sending.");
+        };
+        mediaRecorder.start();
+        $("record-voice").classList.add("recording");
+        $("record-voice").textContent="Stop recording · 0:00";
+        updateAttachmentControls();
+        recordingTimer=window.setInterval(()=>{
+          recordingSeconds+=1;
+          $("record-voice").textContent=`Stop recording · 0:${String(recordingSeconds).padStart(2,"0")}`;
+          if(recordingSeconds>=30)$("record-voice").click();
+        },1000);
+      }catch(error){
+        recordingStream?.getTracks().forEach(track=>track.stop());
+        recordingStream=null;
+        mediaRecorder=null;
+        setStatus(error.name==="NotAllowedError"?"Microphone access was blocked. Allow microphone access and try again.":"Could not start voice recording: "+error.message);
+        updateAttachmentControls();
+      }
+    });
+    async function start(){
+      const localAccount=window.SquadUpLocalAuth.getSession();
+      if(localAccount){
+        localMode=true;
+        uid=localAccount.id;
+        $("gamer-tag").value=localAccount.gamerTag;
+        setStatus("Local chat · messages stay in this browser and are visible to local accounts");
+        await loadProfiles();
+        await refreshMessages();
+        window.addEventListener("storage",event=>{
+          if(event.key==="sq2_local_accounts"||event.key==="sq2_local_direct_messages"){
+            const previouslySeen=new Set(notifiedMessageIds);
+            refreshMessages().then(()=>{
+            if(event.key!=="sq2_local_direct_messages")return;
+            const incoming=messages.filter(message=>message.recipient_id===uid&&!previouslySeen.has(message.id));
+            for(const item of incoming){
+              notifiedMessageIds.add(item.id);
+              const sender=profiles.get(item.sender_id)?.gamer_tag||"A player";
+              if("Notification"in window&&Notification.permission==="granted"&&document.visibilityState!=="visible"){
+                const notification=new Notification("New SquadUp message",{body:sender+": "+(attachmentPreview(item)||"Sent an attachment"),icon:"squadup-logo.svg",tag:"squadup-message-"+item.id});
+                notification.onclick=()=>{window.focus();selectContact(item.sender_id)};
+              }else{
+                setStatus("New message from "+sender);
+              }
+            }
+          }).catch(error=>setStatus("Could not check for new messages: "+error.message));
+          }
+        });
+        return;
+      }
+      if(!client){
+        setStatus("Log in to message local players.");
+        $("status").innerHTML='Log in to use local messaging. <a href="login.html?next=messages.html" style="color:#c4b8ff;text-decoration:underline">Log in</a> · <a href="signup.html?next=messages.html" style="color:#c4b8ff;text-decoration:underline">Create account</a>';
+        $("contacts").innerHTML='<div class="empty-contacts">Sign in to find other local player accounts and message them from this browser.</div>';
+        $("message").disabled=true;
+        $("send").disabled=true;
+        return;
+      }
+      const {data:{session},error}=await client.auth.getSession();
+      if(error){setStatus("Could not check your login: "+error.message);return}
+      if(!session){
+        setStatus("Log in to use messaging. ");
+        $("status").innerHTML='Log in to use messaging. <a href="login.html?next=messages.html" style="color:#c4b8ff;text-decoration:underline">Log in</a> · <a href="signup.html" style="color:#c4b8ff;text-decoration:underline">Create account</a>';
+        $("contacts").innerHTML='<div class="empty-contacts">Sign in to find players and send private messages.</div>';
+        $("message").disabled=true;
+        $("send").disabled=true;
+        return;
+      }
+      uid=session.user.id;
+      const {data:profile,error:profileError}=await client.from("profiles").select("gamer_tag").eq("id",uid).maybeSingle();
+      if(profileError){setStatus("Could not load your profile: "+profileError.message);return}
+      $("gamer-tag").value=profile?.gamer_tag||session.user.user_metadata?.gamer_tag||"Player";
+      await loadProfiles();
+      await refreshMessages();
+      if(channel)await client.removeChannel(channel);
+      channel=client.channel("direct-messages-"+uid).on("postgres_changes",{event:"*",schema:"public",table:"direct_messages"},()=>refreshMessages()).subscribe((state)=>{
+        if(state==="SUBSCRIBED")setStatus("Connected · messages update live");
+        if(state==="CHANNEL_ERROR"||state==="TIMED_OUT")setStatus("Realtime connection problem. Check your internet and Supabase settings.");
+      });
+      client.auth.onAuthStateChange((event)=>{
+        if(event==="SIGNED_OUT")location.href="login.html?next=messages.html";
+      });
+    }
+    $("contacts").addEventListener("click",event=>{
+      const button=event.target.closest("[data-peer]");
+      if(button)selectContact(button.dataset.peer);
+    });
+    $("message").addEventListener("input",updateSendButton);
+    $("search").addEventListener("input",()=>{
+      clearTimeout(searchTimer);
+      searchTimer=setTimeout(()=>loadProfiles($("search").value.trim()),250);
+    });
+    $("mobile-back").addEventListener("click",()=>$("messenger").classList.remove("show-conversation"));
+    $("composer").addEventListener("submit",async event=>{
+      event.preventDefault();
+      const body=$("message").value.trim();
+    if(!selected||(!body&&!pendingAttachment)||body.length>300)return;
+    if(mediaRecorder){setStatus("Stop the voice recording before sending.");return}
+    $("send").disabled=true;
+    if(localMode){
+      try{
+        window.SquadUpLocalAuth.sendMessage(selected,body,pendingAttachment);
+        $("message").value="";
+        clearAttachment();
+        await refreshMessages();
+        setStatus("Local chat · message saved in this browser");
+        }catch(error){setStatus("Message not sent: "+error.message)}
+        finally{$("send").disabled=false}
+        return;
+      }
+      const {error}=await client.from("direct_messages").insert({sender_id:uid,recipient_id:selected,body});
+      $("send").disabled=false;
+      if(error){setStatus("Message not sent: "+error.message);return}
+      $("message").value="";
+      setStatus("Connected · messages update live");
+      await refreshMessages();
+    });
+    $("logout").addEventListener("click",async()=>{
+      if(localMode){
+        window.SquadUpLocalAuth.signOut();
+        location.href="login.html?next=messages.html";
+        return;
+      }
+      const {error}=await client.auth.signOut();
+      if(error){setStatus("Could not log out: "+error.message);return}
+      location.href="login.html";
+    });
+    start().catch(error=>setStatus("Messaging could not start: "+error.message));
+  </script>
+</body>
+</html>

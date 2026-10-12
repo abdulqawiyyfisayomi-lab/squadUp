@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="squadup-logo.svg" type="image/svg+xml">
+<title>SquadUp – Find your squad</title>
+<style>
+:root{--bg:#f3f4f8;--card:#fff;--tx:#14161f;--mu:#6b7080;--bd:#e3e5ee;--ac:#6c4cff;--ac2:#fff;--ok:#16a34a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d0f16;--card:#161925;--tx:#eceef6;--mu:#8b90a3;--bd:#252938;--ac:#8b73ff;--ac2:#0d0f16;--ok:#4ade80}}
+:root[data-theme="dark"]{--bg:#0d0f16;--card:#161925;--tx:#eceef6;--mu:#8b90a3;--bd:#252938;--ac:#8b73ff;--ac2:#0d0f16;--ok:#4ade80}
+*{box-sizing:border-box}html,body{margin:0}body{background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+button,input,select,textarea{font:inherit;color:var(--tx)}
+input,select,textarea{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:9px 12px;max-width:100%}
+button{cursor:pointer;border:1px solid var(--bd);background:var(--card);border-radius:10px;padding:8px 13px}
+button.p{background:var(--ac);color:var(--ac2);border-color:var(--ac);font-weight:600}
+button.d{color:#dc2626}
+.top{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:14px 20px;max-width:1150px;margin:auto}
+h1{margin:0;font-size:22px;display:flex;align-items:center;gap:9px}h1 span{color:var(--ac)}
+.brand-mark{width:34px;height:34px;object-fit:contain;filter:drop-shadow(0 3px 8px color-mix(in srgb,var(--ac) 35%,transparent))}
+.wordmark-pad{width:25px;height:18px;vertical-align:-2px;margin:0 2px;filter:drop-shadow(0 2px 5px color-mix(in srgb,var(--ac) 30%,transparent))}
+.wrap{max-width:1150px;margin:auto;padding:0 20px 28px}
+.status{font-size:12px;color:var(--mu);padding:0 20px;max-width:1150px;margin:auto}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin:8px 0 14px}
+.game-players{margin:14px 0;padding:16px;background:var(--card);border:1px solid var(--bd);border-radius:14px}
+.game-players[hidden]{display:none}
+.game-players-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.game-player-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin-top:12px}
+.game-player{display:flex;align-items:center;gap:10px;min-width:0;padding:11px;border:1px solid var(--bd);border-radius:12px;background:var(--bg)}
+.game-player-avatar{flex:none;width:44px;height:44px;border-radius:50%;object-fit:cover;background:var(--ac);color:white;display:grid;place-items:center;font-weight:700}
+.game-player-info{flex:1;min-width:0}
+.game-player-info strong,.game-player-info small{display:block;overflow-wrap:anywhere}
+.game-player-info small{margin-top:3px;color:var(--mu);font-size:12px}
+.game-player-bio{margin:6px 0 0;color:var(--mu);font-size:12px;line-height:1.45}
+.game-player-message{flex:none;padding:7px 9px;border:1px solid var(--ac);border-radius:9px;background:var(--ac);color:var(--ac2);font-size:12px;font-weight:650;text-decoration:none;white-space:nowrap}
+.tile{text-align:left;border-radius:14px;padding:18px;min-height:96px;border:2px solid transparent;color:#fff;display:flex;flex-direction:column;justify-content:space-between;background-color:var(--tile-color,#6c4cff);background-image:linear-gradient(135deg,rgba(15,23,42,.1),rgba(15,23,42,.65)),var(--tile-image,none);background-size:cover;background-position:center;position:relative;transform-origin:center;transition:transform .2s ease;cursor:pointer}
+@media(hover:hover){.tile:hover{transform:scale(1.3);z-index:1}}
+.tile.is-selected{transform:scale(1.3);z-index:1}
+.tile:focus-visible{outline:3px solid var(--ac);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){.tile{transition:none}}
+.tile b{font-size:15px}.tile small{opacity:.9}
+.grid{display:grid;grid-template-columns:1.25fr 1fr;gap:16px;align-items:start}
+@media(max-width:860px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;transition:transform .18s ease}
+@media(hover:hover){.card:hover{transform:scale(.97)}}
+.bar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}.bar input{flex:1;min-width:120px}
+.hub-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:12px 0 14px}.mini-card{border:1px solid var(--bd);background:var(--card);border-radius:12px;padding:10px 12px}.mini-card.info{border-left:3px solid var(--ac)}.mini-card.alert{border-left:3px solid #f59e0b}.mini-card.success{border-left:3px solid var(--ok)}.mini-card small{display:block;color:var(--mu);margin-top:5px}.mini-card .chip{display:inline-block;padding:2px 6px;border-radius:999px;background:var(--bd);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+.profile-shell{display:grid;gap:10px}.profile-top{display:flex;justify-content:space-between;align-items:center;gap:10px}.profile-badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:999px;background:color-mix(in srgb,var(--ac) 15%,var(--card));color:var(--ac);font-weight:700;font-size:11px}.profile-summary{color:var(--mu);font-size:13px;line-height:1.5}.profile-actions{display:flex;gap:8px;flex-wrap:wrap}.profile-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.profile-grid .w{grid-column:1/-1}.squad-item{padding:8px 10px;border:1px solid var(--bd);border-radius:10px;background:color-mix(in srgb,var(--card) 92%,var(--bd));display:grid;gap:4px;margin-top:8px}.squad-item strong{display:flex;justify-content:space-between;gap:8px}.squad-badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}.squad-badges span{display:inline-flex;padding:2px 7px;border-radius:999px;background:var(--bd);font-size:11px}.trending{display:grid;gap:8px}.trending-item{padding:8px 10px;border:1px solid var(--bd);border-radius:10px;background:color-mix(in srgb,var(--card) 92%,var(--bd));display:flex;justify-content:space-between;gap:8px}.trending-item b{display:block}.trending-item small{color:var(--mu)}
+details.card{margin-bottom:12px}summary{cursor:pointer;font-weight:600}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.form .w{grid-column:1/-1}
+.post{display:flex;gap:12px;padding:13px 0;border-top:1px solid var(--bd)}.post:first-child{border-top:0}
+.av{flex:none;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:13px}
+.post-avatar{object-fit:cover;background:var(--bd)}
+.pb{flex:1;min-width:0}.pt{font-weight:600}
+.tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:6px;background:var(--bd);margin:4px 5px 0 0}
+.mu{color:var(--mu);font-size:13px}.ok{color:var(--ok);font-weight:600}
+.acts{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.acts button{font-size:12px}
+.saved-list{display:grid;gap:8px}
+.saved-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border:1px solid var(--bd);border-radius:10px}
+.saved-row>div{min-width:0}.saved-row strong,.saved-row small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.saved-row small{margin-top:3px;color:var(--mu)}
+.saved-row button{flex:none;padding:5px 8px;font-size:11px}
+.post.is-full{opacity:.78}
+.chat{position:sticky;top:8px}
+#msgs{height:340px;overflow-y:auto;display:flex;flex-direction:column;gap:7px;padding:6px 0}
+.m{max-width:85%;padding:7px 11px;border-radius:12px;background:var(--bd);font-size:14px;overflow-wrap:anywhere}
+.m b{display:block;font-size:11px;color:var(--mu)}.m.me{align-self:flex-end;background:var(--ac);color:var(--ac2)}.m.me b{color:inherit;opacity:.8}
+.m.sys{align-self:center;background:none;color:var(--mu);font-size:12px;padding:0}
+.send{display:flex;gap:8px;margin-top:8px}.send input{flex:1;min-width:0}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:9px 14px;border-radius:10px;font-size:14px;display:none;z-index:9}
+.nav{position:sticky;top:0;z-index:5;backdrop-filter:blur(10px);background:color-mix(in srgb,var(--bg) 85%,transparent);border-bottom:1px solid var(--bd)}
+.nav .top{padding:10px 20px}.links{display:flex;gap:18px;align-items:center}.links a{color:var(--mu);text-decoration:none;font-size:14px}
+.links a.profile-link{padding:7px 12px;border:1px solid color-mix(in srgb,var(--ac) 45%,var(--bd));border-radius:999px;background:color-mix(in srgb,var(--ac) 12%,var(--card));color:var(--ac);font-weight:750}
+#messagesLink{position:relative;display:inline-flex;align-items:center}
+.message-count{position:absolute;top:-5px;right:-7px;display:grid;width:18px;height:18px;place-items:center;padding:0;border:2px solid var(--bg);border-radius:50%;background:#dc2626;color:#fff;font-size:9px;font-weight:800;line-height:1}
+.message-count[hidden]{display:none}
+.message-bell{display:inline-block;width:16px;height:16px;margin-left:5px;vertical-align:-3px;color:var(--mu)}
+#messagesLink.has-unread .message-bell{color:#dc2626}
+.message-alert-toggle{padding:6px 9px;border:1px solid var(--bd);border-radius:9px;background:var(--card);color:var(--mu);font-size:11px;cursor:pointer}
+.message-alert-toggle:disabled{opacity:.7;cursor:default}
+@media(max-width:700px){.links a:not(.auth-link):not([href="login.html"]):not([href="messages.html"]):not(.profile-link){display:none}}
+@media(max-width:700px){.nav .top{gap:8px;padding:10px 14px}.links{width:100%;justify-content:space-between;flex-wrap:wrap;gap:9px}.links input{width:135px;flex:1;min-width:110px}}
+.hero{max-width:1150px;margin:auto;padding:52px 20px 20px;text-align:center}
+.hero h2{font-size:clamp(32px,6vw,56px);line-height:1.05;margin:0 0 14px;letter-spacing:-.02em}
+.hero h2 em{font-style:normal;background:linear-gradient(90deg,var(--ac),#ec4899);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{max-width:560px;margin:0 auto 22px;color:var(--mu);font-size:18px}
+.cta{display:inline-block;text-decoration:none;padding:13px 24px;border-radius:12px;font-weight:700;background:var(--ac);color:var(--ac2)}
+.stats{display:flex;justify-content:center;gap:32px;margin-top:28px;flex-wrap:wrap}.stats b{display:block;font-size:26px}.stats span{color:var(--mu);font-size:13px}
+.sec{max-width:1150px;margin:auto;padding:36px 20px}.sec h3{font-size:26px;margin:0 0 16px}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.n{width:32px;height:32px;border-radius:50%;background:var(--ac);color:var(--ac2);display:grid;place-items:center;font-weight:700;margin-bottom:8px}
+.faq details{border-top:1px solid var(--bd);padding:12px 0}.faq summary{font-weight:600}.faq p{color:var(--mu);margin:8px 0 0}
+.world-section{position:relative;padding:26px 20px 12px;max-width:1150px;margin:auto}.world-header{display:flex;align-items:end;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-bottom:16px}.eyebrow{display:inline-block;padding:5px 9px;border-radius:999px;background:color-mix(in srgb,var(--ac) 12%,var(--card));border:1px solid color-mix(in srgb,var(--ac) 25%,var(--bd));color:var(--ac);font-weight:700;font-size:12px;margin-bottom:10px;letter-spacing:.08em;text-transform:uppercase}.world-grid{display:grid;grid-template-columns:1.2fr .8fr .8fr;gap:12px}.world-card{background:linear-gradient(180deg,color-mix(in srgb,var(--card) 96%,var(--ac)),var(--card));border:1px solid var(--bd);border-radius:20px;padding:18px;box-shadow:0 18px 40px rgba(15,23,42,.06)}.globe-wrap{display:grid;place-items:center;min-height:200px;position:relative;overflow:hidden}.globe{position:relative;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#7c3aed 0%,#6c4cff 35%,#111827 100%);box-shadow:inset 0 0 32px rgba(255,255,255,.25),0 18px 40px rgba(108,76,255,.25)}.globe:before,.globe:after{content:"";position:absolute;border:1px solid rgba(255,255,255,.28);border-radius:50%}.globe:before{inset:16px}.globe:after{inset:34px}.globe-dot{position:absolute;width:8px;height:8px;background:#fff;border-radius:50%;box-shadow:0 0 0 6px rgba(255,255,255,.18);animation:pulse 2.4s ease-in-out infinite}.globe-dot.one{top:34px;left:48px}.globe-dot.two{bottom:40px;left:62px}.globe-dot.three{top:62px;right:36px}.region-list,.country-list{display:flex;gap:8px;flex-wrap:wrap}.region-pill,.country-chip{display:inline-flex;align-items:center;padding:7px 10px;border-radius:999px;border:1px solid var(--bd);background:rgba(255,255,255,.04);font-size:12px;font-weight:600}.country-chip{background:color-mix(in srgb,var(--ac) 10%,var(--card));border-color:color-mix(in srgb,var(--ac) 20%,var(--bd));color:var(--tx)}.metric-stack{display:grid;gap:12px}.metric-box{padding:12px 14px;border:1px solid var(--bd);border-radius:14px;background:rgba(255,255,255,.02)}.metric-box strong{display:block;font-size:26px;letter-spacing:-.04em}.metric-box span{color:var(--mu);font-size:12px;text-transform:uppercase;letter-spacing:.06em}.cta.small{padding:11px 18px;font-size:14px}.feature-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:12px}.feature-tile{padding:14px 16px;border:1px solid var(--bd);background:var(--card);border-radius:16px}.feature-tile b{display:block;font-size:18px;margin-bottom:5px}.feature-tile p{margin:0;color:var(--mu)}
+footer{border-top:1px solid var(--bd);padding:26px 20px;text-align:center;color:var(--mu);font-size:13px}
+body{min-height:100vh;background:radial-gradient(ellipse at 15% 0%,color-mix(in srgb,var(--ac) 12%,transparent),transparent 38%),radial-gradient(ellipse at 90% 36%,color-mix(in srgb,#ec4899 7%,transparent),transparent 32%),var(--bg)}
+.nav{box-shadow:0 8px 28px rgba(15,23,42,.08)}
+.profile-card{scroll-margin-top:80px}
+.profile-avatar{width:42px;height:42px;flex:none;overflow:hidden;border:2px solid color-mix(in srgb,var(--ac) 55%,var(--bd));border-radius:50%;background:linear-gradient(145deg,#765cff,#d14bc0);object-fit:cover}
+h1{letter-spacing:-.04em}h1 span{ text-shadow:0 0 22px color-mix(in srgb,var(--ac) 38%,transparent)}
+.links a{transition:color .18s ease}.links a:hover{color:var(--ac)}
+input,select,textarea{transition:border-color .18s ease,box-shadow .18s ease}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--ac);box-shadow:0 0 0 3px color-mix(in srgb,var(--ac) 18%,transparent)}
+button,.cta{transition:transform .18s ease,box-shadow .18s ease,background-color .18s ease}
+button:hover,.cta:hover{transform:translateY(-2px);box-shadow:0 8px 20px color-mix(in srgb,var(--ac) 22%,transparent)}
+button:active,.cta:active{transform:translateY(0) scale(.98)}
+.hero{position:relative;isolation:isolate;overflow:hidden;border:1px solid color-mix(in srgb,var(--ac) 20%,var(--bd));border-radius:28px;margin-top:24px;padding:64px 24px 34px;background:linear-gradient(140deg,color-mix(in srgb,var(--card) 94%,var(--ac)),var(--card) 58%,color-mix(in srgb,var(--card) 92%,#ec4899));box-shadow:0 24px 70px rgba(25,20,55,.12);animation:rise-in .65s both}
+.hero:before,.hero:after{content:"";position:absolute;z-index:-1;border-radius:50%;pointer-events:none;filter:blur(2px)}
+.hero:before{width:300px;height:300px;right:-90px;top:-170px;background:radial-gradient(circle,color-mix(in srgb,var(--ac) 28%,transparent),transparent 70%)}
+.hero:after{width:260px;height:260px;left:-120px;bottom:-190px;background:radial-gradient(circle,color-mix(in srgb,#ec4899 20%,transparent),transparent 70%)}
+.hero h2{animation:rise-in .65s .08sboth}.hero p{animation:rise-in .65s .16s both}.hero .cta{animation:rise-in .65s .24s both}
+.stats>div{min-width:130px;padding:12px 18px;border:1px solid var(--bd);border-radius:14px;background:color-mix(in srgb,var(--card) 72%,transparent);box-shadow:0 8px 24px rgba(15,23,42,.05)}
+.stats b{font-variant-numeric:tabular-nums}
+.tiles{padding:8px 6px 14px}
+.tile{overflow:hidden;box-shadow:0 10px 24px rgba(15,23,42,.16);transition:transform .28s cubic-bezier(.2,.8,.2,1),box-shadow .28s ease,filter .28s ease;animation:rise-in .5s backwards}
+.tile:before{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(115deg,transparent 25%,rgba(255,255,255,.2) 48%,transparent 70%);transform:translateX(-130%);transition:transform .55s ease;pointer-events:none}
+.tile>*{position:relative;z-index:1}
+.tile:nth-child(2){animation-delay:.03s}.tile:nth-child(3){animation-delay:.06s}.tile:nth-child(4){animation-delay:.09s}.tile:nth-child(5){animation-delay:.12s}
+@media(hover:hover){.tile:hover{transform:scale(1.3) translateY(-5px);z-index:2;box-shadow:0 24px 48px rgba(15,23,42,.3);filter:saturate(1.16)}.tile:hover:before{transform:translateX(130%)}}
+.tile.is-selected{transform:scale(1.3) translateY(-5px);z-index:2;box-shadow:0 24px 48px rgba(15,23,42,.3);outline:2px solid color-mix(in srgb,var(--ac) 75%,white);outline-offset:3px}
+.post{animation:rise-in .28s both}
+.acts button{font-size:13px}
+.chat{box-shadow:0 14px 36px rgba(15,23,42,.08)}
+#msgs{scrollbar-color:var(--bd) transparent;scrollbar-width:thin}
+.m{animation:message-in .2s ease both}
+#toast{box-shadow:0 12px 34px rgba(15,23,42,.22);animation:toast-in .2s ease both}
+footer{margin-top:20px}
+@keyframes rise-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes message-in{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@keyframes toast-in{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.45);opacity:.7}}
+@media(max-width:700px){.hero{margin:14px 12px 0;padding:46px 18px 26px;border-radius:22px}.hero p{font-size:16px}.stats{gap:10px}.stats>div{min-width:calc(33.333% - 10px);padding:10px 8px}.stats b{font-size:22px}.tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding-inline:2px}.world-grid{grid-template-columns:1fr}.world-header{align-items:flex-start}.feature-row{grid-template-columns:1fr 1fr}.country-chip,.region-pill{font-size:11px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
+</style></head><body>
+<div class="nav"><div class="top"><h1><img class="brand-mark" src="squadup-logo.svg" alt=""><span>Squad<img class="wordmark-pad" src="squadup-gamepad.svg" alt="" aria-hidden="true">Up</span></h1><div class="links"><a href="#play">Find players</a><a id="messagesLink" href="messages.html">Messages<svg class="message-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg><span id="messageCount" class="message-count" hidden></span></a><button id="messageAlertToggle" class="message-alert-toggle" type="button" hidden>Enable alerts</button><a class="profile-link" href="profile.html">My Profile</a><a href="#how">How it works</a><a href="#faq">FAQ</a><input id="name" placeholder="Your gamer tag" maxlength="20"><a id="loginLink" href="login.html">Log in</a><a class="auth-link" id="signupLink" href="signup.html">Sign up</a></div></div></div>
+<section class="hero"><h2>Find your squad.<br><em>Win more games.</em></h2>
+<p>Try out squad requests, player profiles, and chat in a local demo. Your data stays in this browser; it is not shared with other players or devices.</p>
+<a class="cta" href="#play">Find players now</a>
+<div class="stats"><div><b id="s1">0</b><span>requests in this browser</span></div><div><b id="s2">0</b><span>open spots</span></div><div><b id="s3">0</b><span>room messages here</span></div></div></section>
+<section class="world-section">
+  <div class="world-header">
+    <div>
+      <div class="eyebrow">Local demo</div>
+      <h3 style="margin:0;font-size:32px;letter-spacing:-.04em">Explore the SquadUp experience.</h3>
+    </div>
+    <a class="cta small" href="#play">Try the demo</a>
+  </div>
+  <div class="feature-row">
+    <div class="feature-tile"><b>Try the full flow</b><p>Create local profiles, post squad requests, and test room chat.</p></div>
+    <div class="feature-tile"><b>Stored in this browser</b><p>Demo accounts, profiles, and messages do not sync or transfer to another device.</p></div>
+    <div class="feature-tile"><b>Not a live community</b><p>There are no shared player accounts, verified identities, or live global lobbies in this demo.</p></div>
+  </div>
+</section>
+<div class="wrap" id="play"><h3 style="font-size:26px;margin:24px 0 4px">Squad requests on this browser</h3><div class="status" id="status" style="padding:0 0 10px">Loading demo data…</div>
+<!--
+  Add a game picture by placing the image beside this HTML file, then add
+  --tile-image:url('image-name.jpg') to that card's style attribute.
+  The Call of Duty card uses call-of-duty.jpg.  
+-->
+<div class="tiles" id="tiles">
+<div class="tile" style="--tile-color:#d97706;--tile-image:url('image/call-of-duty.jpg')"><b>Call of Duty</b><small>4 modes</small></div>
+<div class="tile" style="--tile-color:#b45309;--tile-image:url('image/HD Yellow Call Of Duty Mobile COD Game Logo PNG.jpg')"><b>Call of Duty Mobile</b><small>3 modes</small></div>
+<div class="tile" style="--tile-color:#e11d48;--tile-image:url('image/valorant - Google Search.jpg')"><b>Valorant</b><small>3 modes</small></div>
+<div class="tile" style="--tile-color:#ca8a04;--tile-image:url('image/Counter-Strike 2 is finally here! - esports_inquirer.net')"><b>Counter-Strike 2</b><small>3 modes</small></div>
+<div class="tile" style="--tile-color:#dc2626;--tile-image:url('image/APEX LEGENDS.jpg')"><b>Apex Legends</b><small>3 modes</small></div>
+<div class="tile" style="--tile-color:#7c3aed;--tile-image:url('image/download (20).jpg')"><b>Fortnite</b><small>4 modes</small></div>
+<div class="tile" style="--tile-color:#65a30d;--tile-image:url('image/PlayerUnknown%27s Battlegrounds mobile é gratuito e mundial, confira_.jpg')"><b>PUBG Mobile</b><small>3 modes</small></div>
+<div class="tile" style="--tile-color:#f97316;--tile-image:url('image/Quais são os melhores personagens do Free Fire_.jpg')"><b>Free Fire</b><small>3 modes</small></div>
+<div class="tile" style="--tile-color:#16a34a;--tile-image:url('image/Como corrigir o erro EA FC 27 0xc0000005.jpg')"><b>EA FC 27</b><small>3 modes</small></div>
+<div class="tile" style="--tile-color:#2563eb;--tile-image:url('image/CT-EFOOTBALL (@ct_efootball) on X.jpg')"><b>eFootball</b><small>3 modes</small></div>
+<div class="tile" style="--tile-color:#1d4ed8;--tile-image:url('image/NBA Insider Shams Charania revealed that OKC Thunder star, Shai Gilgeous-Alexander will be the first official star of NBA 2K26_.jpg')"><b>NBA 2K</b><small>3 modes</small></div>
+<div class="tile" style="--tile-color:#0ea5e9;--tile-image:url('image/Dream League Soccer 2026 on TikTok.jpg')"><b>Dream League Soccer</b><small>3 modes</small></div>
+<div class="tile" style="--tile-color:#0ea5e9"><b>Rocket League</b><small>3 modes</small></div>
+<div class="tile" style="--tile-color:#a16207;--tile-image:url('image/New League of Legends logo is universally slated.jpg')"><b>League of Legends</b><small>3 modes</small></div>
+<div class="tile" style="--tile-color:#4f46e5;--tile-image:url('image/Logo Game Mobile Legends.jpg')"><b>Mobile Legends</b><small>3 modes</small></div>
+<div class="tile" style="--tile-color:#9f1239;--tile-image:url('image/Tekken 8 poster in HD.jpg')"><b>Tekken 8</b><small>2 modes</small></div>
+<div class="tile" style="--tile-color:#15803d;--tile-image:url('image/The Top Paid iPad Games of 2017.jpg')"><b>Minecraft</b><small>3 modes</small></div>
+<div class="tile" style="--tile-color:#475569;--tile-image:url('image/download (21).jpg')"><b>Roblox</b><small>3 modes</small></div>
+<div class="tile" style="--tile-color:#0f766e;--tile-image:url('image/%27GTA 5%27 cover art revealed - image.jpg')"><b>GTA Online</b><small>3 modes</small></div>
+<div class="tile" style="--tile-color:#1e40af;--tile-image:url('image/quem joga.jpg')"><b>Clash Royale</b><small>3 modes</small></div>
+<div class="tile" style="--tile-color:#64748b;--tile-image:url('image/download (19).jpg')"><b>Other game</b><small>2 modes</small></div>
+</div>
+<section class="game-players" id="gamePlayers" aria-live="polite" hidden>
+  <div class="game-players-head"><b id="gamePlayersTitle">Players</b><button id="closeGamePlayers" type="button">Close</button></div>
+  <div class="game-player-list" id="gamePlayerList"></div>
+</section>
+<div class="grid">
+<section>
+<details class="card"><summary>+ Post a request</summary>
+<div class="form">
+<select id="fg"></select><select id="fm"></select>
+<select id="fp"><option>PlayStation</option><option>Xbox</option><option>PC</option><option>Mobile</option></select>
+<select id="fn"><option value="1">Need 1 player</option><option value="2">Need 2 players</option><option value="3">Need 3 players</option><option value="4">Need 4 players</option><option value="5">Need 5 players</option></select>
+<input id="fr" placeholder="Region (e.g. Lagos)" maxlength="30">
+<select id="fmic"><option>Mic on</option><option>Mic optional</option><option>No mic</option></select>
+<label class="w" for="fwhen">Session time (your local time; optional)<input id="fwhen" type="datetime-local"></label>
+<input id="ft" class="w" placeholder="Note: rank, play time, vibe…" maxlength="120">
+<div class="acts w"><button class="p" id="post" type="button">Post request</button><button id="cancelEdit" type="button" hidden>Cancel edit</button></div></div></details>
+<div class="bar"><input id="q" placeholder="Search requests or regions"><select id="pf"><option value="">All platforms</option><option>PlayStation</option><option>Xbox</option><option>PC</option><option>Mobile</option></select></div>
+<div class="bar"><select id="gameFilter" aria-label="Filter by game"><option value="">All games</option></select><select id="rankFilter"><option value="">All ranks</option><option>Bronze</option><option>Silver</option><option>Gold</option><option>Platinum</option><option>Diamond</option><option>Elite</option></select><select id="micFilter"><option value="">Any mic</option><option>Mic on</option><option>Mic optional</option><option>No mic</option></select><input id="regionFilter" placeholder="Filter region"></div>
+<div class="bar"><select id="sortRequests" aria-label="Sort requests"><option value="newest">Newest first</option><option value="soonest">Soonest session</option><option value="spots">Most open spots</option></select><label style="display:flex;align-items:center;gap:7px;font-size:13px"><input id="openOnly" type="checkbox">Open squads only</label><label style="display:flex;align-items:center;gap:7px;font-size:13px"><input id="savedOnly" type="checkbox">Saved only</label></div>
+<div class="hub-grid">
+  <div class="card profile-card" id="profile">
+    <div class="profile-top"><div style="display:flex;align-items:center;gap:10px"><img id="profileAvatar" class="profile-avatar" alt="Profile picture" hidden><b>My profile</b></div><span id="profileBadge" class="profile-badge">New</span></div>
+    <a href="profile.html" style="font-size:12px">Edit character profile</a>
+    <div class="profile-shell">
+      <div class="profile-summary" id="profileSummary">Update your profile to try the local matching and invite flow.</div>
+      <div class="profile-grid">
+        <input id="profileTag" placeholder="Gamer tag" maxlength="20">
+        <select id="profilePlatform"><option>PlayStation</option><option>Xbox</option><option>PC</option><option>Mobile</option></select>
+        <select id="profileRank"><option>Bronze</option><option>Silver</option><option>Gold</option><option>Platinum</option><option>Diamond</option><option>Elite</option></select>
+        <input id="profileRegion" placeholder="Region" maxlength="30">
+        <select id="profileMic"><option>Mic on</option><option>Mic optional</option><option>No mic</option></select>
+        <select id="profileSkill"><option>Casual</option><option>Competitive</option><option>Hardcore</option><option>Social</option></select>
+        <select id="profileGame" class="w"><option value="">Favorite game</option></select>
+        <textarea id="profileBio" class="w" rows="3" maxlength="120" placeholder="Bio: play style, vibe, and availability"></textarea>
+      </div>
+      <div class="profile-actions"><button class="p" id="saveProfile">Save profile</button><button id="favoriteCurrent">Use selected game</button></div>
+    </div>
+  </div>
+  <div class="card">
+    <b>Alerts</b>
+    <div id="notifications" style="margin-top:10px;display:grid;gap:8px"></div>
+  </div>
+  <div class="card">
+    <b>My squads</b>
+    <div id="mySquads" style="margin-top:10px"></div>
+  </div>
+  <div class="card">
+    <b>Saved players &amp; squads</b>
+    <div id="savedItems" class="saved-list" style="margin-top:10px"></div>
+  </div>
+  <div class="card">
+    <b>Trending now</b>
+    <div id="trendingList" style="margin-top:10px"></div>
+  </div>
+</div>
+<div class="card" id="feed"></div>
+</section>
+<aside class="card chat"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b id="rt">Chat</b><button id="lobby" style="display:none">← Lobby</button></div>
+<div class="mu" id="rm"></div><div id="msgs"></div>
+<div class="send"><input id="mi" placeholder="Message…" maxlength="300"><button class="p" id="sb">Send</button></div></aside>
+</div></div>
+<section class="sec" id="how"><h3>How it works</h3><div class="steps">
+<div class="card"><div class="n">1</div><b>Pick your game</b><p class="mu">Tap a game card to find local profiles that chose it, or filter squad requests by game, rank, region, or mic.</p></div>
+<div class="card"><div class="n">2</div><b>Join or post</b><p class="mu">Try posting a session time, saving a request, joining a squad, or managing your own request.</p></div>
+<div class="card"><div class="n">3</div><b>Try the chat</b><p class="mu">Use the local squad room to test the flow. It is not a live chat with players on other devices.</p></div></div></section>
+<section class="sec"><h3>Play fair</h3><div class="card"><p class="mu" style="margin:0">Be respectful. No hate, harassment, cheating services, account selling or sharing personal details. Never send money to a stranger. Close your request when your squad is full.</p></div></section>
+<section class="sec faq" id="faq"><h3>FAQ</h3>
+<details><summary>Is it free?</summary><p>Yes, posting, joining and chatting are free.</p></details>
+<details><summary>Which games and platforms?</summary><p>21 game options across shooters, battle royale, sports, MOBA, fighting and sandbox titles, on PlayStation, Xbox, PC and Mobile. Pick Other game for anything not listed.</p></details>
+<details><summary>Is this connected to other players?</summary><p>No. This demo keeps accounts, requests, profiles, and chat in this browser. Other people and devices cannot see or join your data.</p></details>
+<details><summary>How do I get into the game with your squad?</summary><p>This demo does not contact game services. You can use its local room chat to try the flow, then share an in-game ID or party code yourself when you play.</p></details>
+<details><summary>How do I leave or close a request?</summary><p>Press Leave on a squad you joined, or Close on a request you posted.</p></details></section>
+<footer><b>SquadUp demo</b> · Try local profiles, squad requests, and chat.<br>Data stays in this browser and can be removed in your browser's site-data settings. Do not use real passwords or share sensitive personal details.<br>Not affiliated with any game publisher. Game names belong to their owners.</footer>
+<div id="toast"></div>
+<script src="local-auth.js"></script>
+<script>
+const G=(cat,c,s,m)=>({cat,c,s,m});
+const GAMES={"Call of Duty":G("Shooter","#d97706","COD",["Warzone","Multiplayer","Ranked","Zombies"]),"Call of Duty Mobile":G("Shooter","#b45309","CODM",["Multiplayer","Battle Royale","Ranked"]),"Valorant":G("Shooter","#e11d48","VAL",["Competitive","Unrated","Spike Rush"]),"Counter-Strike 2":G("Shooter","#ca8a04","CS2",["Premier","Competitive","Casual"]),"Apex Legends":G("Battle Royale","#dc2626","APEX",["Trios","Duos","Ranked"]),"Fortnite":G("Battle Royale","#7c3aed","FN",["Squads","Duos","Zero Build","Ranked"]),"PUBG Mobile":G("Battle Royale","#65a30d","PUBG",["Squads","Duos","Team Deathmatch"]),"Free Fire":G("Battle Royale","#f97316","FF",["Squads","Duos","Clash Squad"]),"EA FC 27":G("Sports","#16a34a","FC",["Pro Clubs","Ultimate Team","Friendlies"]),"eFootball":G("Sports","#2563eb","eF",["Dream Team","Online Match","Co-op"]),"NBA 2K":G("Sports","#1d4ed8","2K",["Park","Pro-Am","MyTeam"]),"Dream League Soccer":G("Sports","#0ea5e9","DLS",["Dream Team","Career","Online"]),"Rocket League":G("Sports","#0ea5e9","RL",["2v2","3v3","Ranked"]),"League of Legends":G("MOBA","#a16207","LoL",["Ranked Flex","Normal Draft","ARAM"]),"Mobile Legends":G("MOBA","#4f46e5","MLBB",["Ranked","Classic","Brawl"]),"Tekken 8":G("Fighting","#9f1239","T8",["Ranked","Player Match"]),"Minecraft":G("Sandbox","#15803d","MC",["Survival","Realms","Minigames"]),"Roblox":G("Sandbox","#475569","RBX",["Social","Adventure","Competitive"]),"GTA Online":G("Sandbox","#0f766e","GTA",["Heists","Freemode","Races"]),"Clash Royale":G("Mobile","#1e40af","CR",["Clan Wars","2v2","Ladder"]),"Other game":G("Other","#64748b","+",["Casual","Ranked"])}, PROFILE_DEFAULT={tag:"",platform:"PC",rank:"Gold",region:"Lagos",mic:"Mic on",skill:"Casual",bio:"Looking for a chill, competitive crew.",favoriteGame:"Valorant"};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const ls={get(k,d){try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let S=null,uid="",posts=[],msgs=[],members=[],room="lobby:All",roomTitle="Demo lobby",authUser=null,editingPostId="";
+function toast(t){const e=$("toast");e.textContent=t;e.style.display="block";clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display="none",2800)}
+let notifiedMessageIds=new Set(),messageAlertsReady=false;
+function refreshMessageAlerts(notifyNew=false){
+const badge=$("messageCount"),toggle=$("messageAlertToggle");
+if(!authUser?.localOnly){if(badge)badge.hidden=true;if(toggle)toggle.hidden=true;return}
+const unread=window.SquadUpLocalAuth.getUnreadMessages();
+if(badge){badge.hidden=unread.length===0;badge.textContent=unread.length>9?"9+":String(unread.length);badge.setAttribute("aria-label",unread.length+" unread messages")}
+const messagesLink=$("messagesLink");if(messagesLink){messagesLink.classList.toggle("has-unread",unread.length>0);messagesLink.setAttribute("aria-label",unread.length?`Messages, ${unread.length} unread`:"Messages")}
+if(toggle&&"Notification"in window){toggle.hidden=false;if(Notification.permission==="granted"){toggle.textContent="Alerts on";toggle.disabled=true}else if(Notification.permission==="denied"){toggle.textContent="Alerts blocked";toggle.disabled=true}}
+if(notifyNew&&messageAlertsReady){
+for(const message of unread){
+if(notifiedMessageIds.has(message.id))continue;
+notifiedMessageIds.add(message.id);
+if("Notification"in window&&Notification.permission==="granted"){
+const notification=new Notification("New SquadUp message",{body:message.sender_name+": "+(message.body||message.attachment?.name||"Sent an attachment"),icon:"squadup-logo.svg",tag:"squadup-message-"+message.id});
+notification.onclick=()=>{window.focus();location.href="messages.html?to="+encodeURIComponent(message.sender_id)};
+}else if(document.visibilityState==="visible"){
+toast("New message from "+message.sender_name);
+}
+}
+}
+for(const message of unread)notifiedMessageIds.add(message.id);
+messageAlertsReady=true;
+}
+const messageAlertToggle=document.getElementById("messageAlertToggle");
+messageAlertToggle.addEventListener("click",async()=>{
+if(!("Notification"in window)){toast("Browser notifications are not supported here.");return}
+const permission=await Notification.requestPermission();
+messageAlertToggle.textContent=permission==="granted"?"Alerts on":permission==="denied"?"Alerts blocked":"Enable alerts";
+messageAlertToggle.disabled=permission!=="default";
+if(permission==="granted"){toast("Message alerts enabled");refreshMessageAlerts()}
+else if(permission==="denied")toast("Allow notifications for this site in your browser settings.");
+});
+window.addEventListener("storage",event=>{if(event.key==="sq2_local_direct_messages"||event.key==="sq2_local_accounts")refreshMessageAlerts(true)});
+function ago(t){const s=(Date.now()-t)/1000;if(s<60)return"just now";if(s<3600)return Math.floor(s/60)+"m ago";if(s<86400)return Math.floor(s/3600)+"h ago";return Math.floor(s/86400)+"d ago"}
+function getProfile(){const p=ls.get("sq2_profile",{});return{...PROFILE_DEFAULT,...p}}
+function saveProfile(p){if(authUser?.localOnly)window.SquadUpLocalAuth.saveProfile(p);else ls.set("sq2_profile",p);}
+async function saveRemoteProfile(p){if(!authUser||authUser.localOnly||!window.squadUpSupabase)return;const {error}=await window.squadUpSupabase.from("profiles").update({gamer_tag:p.tag,game:p.favoriteGame||"",platform:p.platform||"",region:p.region||""}).eq("id",uid);if(error)throw error}
+function buildProfileBadge(profile){const score=[profile.tag,profile.rank,profile.region,profile.bio,profile.favoriteGame].filter(Boolean).length;return score>=4?"Profile ready":score>=2?"Getting started":"New profile"}
+function applyProfilePanel(){if(!$("profileTag"))return;const profile=getProfile();$("name").value=profile.tag||$("name").value||"";$("profileTag").value=profile.tag||"";$("profilePlatform").value=profile.platform||"PC";$("profileRank").value=profile.rank||"Gold";$("profileRank").disabled=!!authUser?.localOnly;$("profileRegion").value=profile.region||"";$("profileMic").value=profile.mic||"Mic on";$("profileSkill").value=profile.skill||"Casual";$("profileBio").value=profile.bio||"";const opts=Object.keys(GAMES).map(g=>`<option value="${esc(g)}">${esc(g)}</option>`).join("");$("profileGame").innerHTML='<option value="">Favorite game</option>'+opts;$("profileGame").value=profile.favoriteGame||"";$("profileBadge").textContent=buildProfileBadge(profile);$("profileSummary").textContent=`${profile.tag||"Player"} · ${profile.rank} · ${profile.region||"Anywhere"} · ${profile.skill} · ${profile.mic}`;const avatar=$("profileAvatar");if(avatar){avatar.src=profile.avatar||"";avatar.hidden=!profile.avatar;}}
+function updateNameField(){const name=($("name").value||"").trim();if(!name)return;const profile=getProfile();profile.tag=name;saveProfile(profile);applyProfilePanel();}
+function tag(){const n=($("name").value||getProfile().tag||"").trim();if(!n){$("name").focus();toast("Pick a gamer tag first");return null}ls.set("sq2_name",n);const profile=getProfile();profile.tag=n;saveProfile(profile);applyProfilePanel();return n}
+function readSaved(key){const value=ls.get(key,[]);if(!Array.isArray(value)){toast("Saved items are invalid; remove this site's saved data to reset them.");return []}return value}
+function writeSaved(key,value){try{localStorage.setItem(key,JSON.stringify(value));return true}catch(e){toast("Could not save this item in browser storage.");return false}}
+function savedPostIds(){return readSaved("sq2_saved_posts").map(String)}
+function savedPlayers(){return readSaved("sq2_saved_players").filter(player=>player&&typeof player.id==="string")}
+function profileForPost(post,playerMap){const own=post.uid===uid?getProfile():null;const remote=playerMap.get(post.uid);const profile=own||remote||{};return{tag:profile.tag||profile.gamer_tag||post.u||"Player",avatar:profile.avatar||post.avatar||"",game:profile.favoriteGame||profile.game||post.favoriteGame||post.g||"",platform:profile.platform||post.playerPlatform||post.p||"",rank:profile.rank||post.rank||"",region:profile.region||post.r||"",mic:profile.mic||post.mic||"",skill:profile.skill||post.skill||"",bio:profile.bio||post.bio||""}}
+function safeAvatar(value){return /^data:image\/(?:jpeg|png|webp);base64,/i.test(value||"")?value:""}
+function saveRequest(postId){const ids=savedPostIds();if(ids.includes(String(postId))){writeSaved("sq2_saved_posts",ids.filter(id=>id!==String(postId)));toast("Squad removed from saved items")}else{ids.push(String(postId));if(!writeSaved("sq2_saved_posts",ids))return;toast("Squad saved in this browser")}feed()}
+function savePlayer(post,profile){const players=savedPlayers();const existing=players.some(player=>player.id===post.uid);const next=existing?players.filter(player=>player.id!==post.uid):[...players,{id:post.uid,tag:profile.tag,avatar:safeAvatar(profile.avatar),game:profile.game,platform:profile.platform,rank:profile.rank,region:profile.region,mic:profile.mic,skill:profile.skill,bio:profile.bio}];if(!writeSaved("sq2_saved_players",next))return;toast(existing?"Player removed from saved items":"Player saved in this browser");feed()}
+function renderSavedItems(playerMap=new Map()){const container=$("savedItems");if(!container)return;const ids=savedPostIds(),players=savedPlayers();const playerRows=players.map(player=>{const latest=posts.find(post=>post.uid===player.id);const current=playerMap.get(player.id)||{};const tag=current.gamer_tag||player.tag||latest?.u||"Player";const game=current.game||player.game||latest?.g||"Game not set";return`<div class="saved-row"><div><strong>${esc(tag)}</strong><small>${esc(game)} · saved player</small></div><div><button data-saved-kind="player-view" data-saved-id="${esc(player.id)}" ${latest?"":"disabled"}>Find</button> <button data-saved-kind="player" data-saved-id="${esc(player.id)}">Remove</button></div></div>`});const postRows=ids.map(id=>{const post=posts.find(item=>String(item.id)===id);return`<div class="saved-row"><div><strong>${esc(post?post.g+" · "+post.m:"Request unavailable")}</strong><small>${post?esc(post.u+" · "+(post.r||"Anywhere")):"This request may have been closed"}</small></div><button data-saved-kind="post" data-saved-id="${esc(id)}">${post?"View":"Remove"}</button></div>`});container.innerHTML=playerRows.concat(postRows).join("")||'<div class="mu">Save players and squad requests from the list to find them here.</div>'}
+function showSavedPost(id){if($("savedOnly").checked){$("savedOnly").checked=false}if($("openOnly").checked){$("openOnly").checked=false}for(const filter of ["q","pf","gameFilter","rankFilter","micFilter","regionFilter"])$(filter).value="";feed();const card=Array.from(document.querySelectorAll("[data-request-id]")).find(element=>element.dataset.requestId===id);if(card){card.scrollIntoView({behavior:"smooth",block:"center"});card.classList.add("is-selected");setTimeout(()=>card.classList.remove("is-selected"),1200);return}toast("This request has been closed or is no longer available.")}
+function removeSaved(kind,id){if(kind==="player-view"){const latest=posts.find(post=>post.uid===id);if(latest)showSavedPost(String(latest.id));else toast("No current squad request from this saved player.");return}const key=kind==="post"?"sq2_saved_posts":"sq2_saved_players";const current=kind==="post"?savedPostIds():savedPlayers();const next=current.filter(item=>(kind==="post"?String(item):item.id)!==id);if(writeSaved(key,next))feed()}
+function editRequest(post){editingPostId=String(post.id);$("fg").value=post.g;$("fm").innerHTML=(GAMES[post.g]?.m||["Casual"]).map(mode=>`<option>${esc(mode)}</option>`).join("");$("fm").value=post.m;$("fp").value=post.p;$("fn").value=String(post.need||1);$("fr").value=post.r||"";$("fmic").value=post.mic||"Mic optional";$("fwhen").value=post.when||"";$("ft").value=post.t||"";$("post").textContent="Save changes";$("cancelEdit").hidden=false;document.querySelector("details").open=true;document.querySelector("details").scrollIntoView({behavior:"smooth",block:"start"});$("fg").focus()}
+function cancelEdit(){editingPostId="";$("post").textContent="Post request";$("cancelEdit").hidden=true;$("fg").selectedIndex=0;modes();$("fp").selectedIndex=0;$("fn").value="1";$("fr").value="";$("fmic").selectedIndex=0;$("fwhen").value="";$("ft").value="";document.querySelector("details").open=false}
+function addNotification(message,type="info"){const items=ls.get("sq2_notifications",[]);items.unshift({id:rid(),text:message,type,ts:Date.now()});ls.set("sq2_notifications",items.slice(0,8));renderNotifications()}
+function renderNotifications(){if(!$("notifications"))return;const items=ls.get("sq2_notifications",[]);$("notifications").innerHTML=items.length?items.slice(0,4).map(n=>`<div class="mini-card ${n.type||"info"}"><span class="chip">${esc(String(n.type||"info").toUpperCase())}</span><div>${esc(n.text)}</div><small>${ago(n.ts)}</small></div>`).join(""):'<div class="mu">No alerts yet. Join a squad or post a request to get started.</div>'}
+function renderMySquads(){if(!$("mySquads"))return;const hosted=posts.filter(p=>p.uid===uid);const joined=posts.filter(p=>members.some(m=>m.pid===p.id&&m.uid===uid)&&p.uid!==uid);const items=[...hosted.map(p=>({kind:"Hosting",title:p.g,meta:`${p.m} · ${p.p}`,spots:spots(p),id:p.id,when:p.when})),...joined.map(p=>({kind:"Joined",title:p.g,meta:`${p.m} · ${p.p}`,spots:spots(p),id:p.id,when:p.when}))];if(!items.length)$("mySquads").innerHTML='<div class="mu">No squads yet. Post a request or join one to start your team.</div>';else $("mySquads").innerHTML=items.map(item=>`<div class="squad-item"><strong><span>${esc(item.kind)}</span><span>${esc(item.spots)} open</span></strong><div>${esc(item.title)}</div><small class="mu">${esc(item.meta)} · ${esc(formatSessionTime(item.when))}</small><div class="squad-badges"><span>Local request</span><span>${esc(item.id.slice(0,6))}</span></div></div>`).join("")}
+function renderTrending(){if(!$("trendingList"))return;const blocked=ls.get("sq2_blocked",[]);const items=[...posts.filter(p=>!blocked.includes(p.uid)&&!p.closed&&spots(p)>0)].sort((a,b)=>spots(b)-spots(a)||b.ts-a.ts).slice(0,4);$("trendingList").innerHTML=items.length?items.map(p=>`<div class="trending-item"><div><b>${esc(p.g)}</b><small>${esc(p.u)} · ${esc(p.r||"Anywhere")}</small></div><span class="chip">${spots(p)} spot${spots(p)===1?"":"s"}</span></div>`).join(""):'<div class="mu">No trending squads right now.</div>'}
+
+/* storage: shared db when available, otherwise this-device demo */
+function localStore(){const L={};const key=n=>"sq2_"+n;const read=n=>ls.get(key(n),[]);const fire=n=>(L[n]||[]).forEach(f=>f());return{live:false,sub(n,cfg,cb){(L[n]=L[n]||[]).push(()=>cb(cfg(read(n))));cb(cfg(read(n)))},async set(n,id,d){const a=read(n).filter(x=>x.id!==id);a.push({id,...d});ls.set(key(n),a.slice(-300));fire(n)},async del(n,id){ls.set(key(n),read(n).filter(x=>x.id!==id));fire(n)}}}
+async function dbStore(db){const C=n=>db.collection(n);return{live:true,sub(n,cfg,cb){let q=C(n);q=n==="members"?q:q.orderBy("ts","desc").limit(n==="messages"?300:150);q.onSnapshot(s=>cb(cfg(s.docs.map(d=>({id:d.id,...d.data()})))),e=>toast("Sync problem: "+e.code))},async set(n,id,d){await C(n).doc(id).set(d)},async del(n,id){await C(n).doc(id).delete()}}}
+const rid=()=>Math.random().toString(36).slice(2,10);
+
+async function init(){
+ let db=null,user=null;
+ try{
+  if(window.squadUpSupabase){
+   const {data,error}=await window.squadUpSupabase.auth.getSession();
+   if(error)throw error;
+   authUser=data.session?.user||null;
+   if(authUser){
+    uid=authUser.id;
+    const {data:profile,error:profileError}=await window.squadUpSupabase.from("profiles").select("gamer_tag,game,platform,region").eq("id",uid).maybeSingle();
+    if(profileError)throw profileError;
+    if(profile){
+     const saved={...getProfile(),tag:profile.gamer_tag,platform:profile.platform||"PC",region:profile.region||"",favoriteGame:profile.game||getProfile().favoriteGame};
+     saveProfile(saved);ls.set("sq2_name",profile.gamer_tag);
+    }
+   }
+  }
+ }catch(e){toast("Account connection problem: "+e.message)}
+ if(!authUser){
+  const localAccount=window.SquadUpLocalAuth.getSession();
+  if(localAccount){
+   authUser={id:localAccount.id,user_metadata:{gamer_tag:localAccount.gamerTag},localOnly:true};
+   uid=localAccount.id;
+  }
+ }
+ try{if(window.claude){db=await claude.use("db");user=await claude.use("user")}}catch(e){}
+ try{if(user&&!uid)uid=(await user.id())||""}catch(e){}
+ if(!uid){uid=ls.get("sq2_uid","");if(!uid){uid="g_"+rid();ls.set("sq2_uid",uid)}}
+ if(authUser){
+  $("name").value=getProfile().tag||authUser.user_metadata?.gamer_tag||"";
+  $("messagesLink").href="messages.html";
+  $("loginLink").textContent=authUser.localOnly?"Log out":"Account";
+  $("loginLink").href=authUser.localOnly?"#":"messages.html";
+  if(authUser.localOnly){
+   $("loginLink").addEventListener("click",event=>{event.preventDefault();window.SquadUpLocalAuth.signOut();location.reload()});
+  }
+  $("signupLink").style.display="none";
+ }else{
+  $("name").value=ls.get("sq2_name","");
+  $("messagesLink").href="login.html?next=messages.html";
+ }
+ refreshMessageAlerts();
+ S=db?await dbStore(db):localStore();
+ $("status").textContent=S.live?"Connected":"Demo mode: requests and room chat are saved only in this browser";
+ S.sub("posts",a=>a.sort((x,y)=>y.ts-x.ts),a=>{posts=a;feed();renderMySquads();renderTrending();});
+ S.sub("members",a=>a,a=>{members=a;feed();chat();renderMySquads();});
+ S.sub("messages",a=>a.sort((x,y)=>x.ts-y.ts),a=>{msgs=a;chat();});
+ applyProfilePanel();
+ renderNotifications();
+}
+function spots(p){return Math.max(0,Number(p.need||1)-members.filter(m=>m.pid===p.id).length)}
+function stats(){if(!$("s1"))return;$("s1").textContent=posts.filter(post=>!post.closed&&spots(post)>0).length;$("s2").textContent=posts.reduce((n,p)=>n+(!p.closed?spots(p):0),0);$("s3").textContent=msgs.filter(m=>!m.sys).length}
+function formatSessionTime(value){if(!value)return"Flexible timing";const date=new Date(value);return Number.isNaN(date.getTime())?"Time not set":date.toLocaleString([],{weekday:"short",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})+" (local)"}
+function feed(){
+stats();
+const q=$("q").value.trim().toLowerCase(),pf=$("pf").value,gameFilter=$("gameFilter").value,rankFilter=$("rankFilter").value,micFilter=$("micFilter").value,regionFilter=$("regionFilter").value.trim().toLowerCase(),blocked=ls.get("sq2_blocked",[]),saved=savedPostIds(),playerMap=new Map((authUser?.localOnly?window.SquadUpLocalAuth.getPlayers():[]).map(player=>[player.id,player]));
+let list=posts.filter(post=>{
+const player=profileForPost(post,playerMap),haystack=[post.t,post.r,post.m,post.u,post.g,post.p,player.tag,player.bio,player.favoriteGame,player.skill,post.when].join(" ").toLowerCase();
+return !blocked.includes(post.uid)&&(!pf||post.p===pf)&&(!gameFilter||post.g===gameFilter)&&(!q||haystack.includes(q))&&(!rankFilter||player.rank===rankFilter)&&(!micFilter||player.mic===micFilter)&&(!regionFilter||[player.region,post.r].some(region=>region&&region.toLowerCase().includes(regionFilter)))&&(!$("openOnly").checked||(!post.closed&&spots(post)>0))&&(!$("savedOnly").checked||saved.includes(String(post.id)));
+});
+const sort=$("sortRequests").value;
+const scheduledTime=post=>{const value=Date.parse(post.when||"");return Number.isFinite(value)?value:Infinity};
+list.sort((a,b)=>sort==="spots"?spots(b)-spots(a)||b.ts-a.ts:sort==="soonest"?scheduledTime(a)-scheduledTime(b)||b.ts-a.ts:b.ts-a.ts);
+const currentSavedPlayers=new Set(savedPlayers().map(player=>player.id));
+$("feed").innerHTML=list.length?list.map(post=>{
+const game=GAMES[post.g]||{c:"#666",s:"?"},openSpots=spots(post),mine=post.uid===uid,joined=members.some(member=>member.pid===post.id&&member.uid===uid),player=profileForPost(post,playerMap),avatar=safeAvatar(player.avatar),full=!!post.closed||openSpots<1;
+return`<article class="post ${full?"is-full":""}" data-request-id="${esc(post.id)}"><img class="av post-avatar" src="${esc(avatar)}" alt="" ${avatar?"":"hidden"}><div class="av" style="background:${game.c}" ${avatar?"hidden":""}>${esc(game.s)}</div><div class="pb"><div class="pt">${esc(post.m)} · ${esc(post.g)}</div>
+<div class="mu">${esc(player.tag)} · ${ago(post.ts)}</div><div class="mu">${esc([player.platform,player.rank,player.region||"Anywhere",player.mic,player.skill].filter(Boolean).join(" · "))}</div>${player.bio?`<div style="margin-top:4px">${esc(player.bio)}</div>`:""}${post.t?`<div style="margin-top:4px">${esc(post.t)}</div>`:""}
+<span class="tag">${esc(post.p)}</span><span class="tag">${esc(post.r||"Anywhere")}</span><span class="tag">${esc(post.mic||player.mic||"Mic optional")}</span><span class="tag">${esc(player.rank||"Unranked")}</span>
+<span class="tag ${!full?"ok":""}">${full?(post.closed?"Host paused":"Squad full"):openSpots+" spot"+(openSpots===1?"":"s")+" left"}</span><span class="tag">${esc(formatSessionTime(post.when))}</span>
+<div class="acts">${mine?`<button data-a="edit" data-i="${esc(post.id)}">Edit</button><button data-a="toggle-full" data-i="${esc(post.id)}">${post.closed?"Reopen":"Mark full"}</button>`:joined?`<button data-a="leave" data-i="${esc(post.id)}">Leave</button>`:`<button class="p" data-a="join" data-i="${esc(post.id)}" ${full?"disabled":""}>Join squad</button>`}
+${mine?"":`<button data-a="message" data-i="${esc(post.id)}">Message player</button><button data-a="save-player" data-i="${esc(post.id)}">${currentSavedPlayers.has(post.uid)?"Unsave player":"Save player"}</button>`}
+<button data-a="save-post" data-i="${esc(post.id)}">${saved.includes(String(post.id))?"Unsave squad":"Save squad"}</button><button data-a="chat" data-i="${esc(post.id)}">Squad chat</button>${mine?`<button class="d" data-a="close" data-i="${esc(post.id)}">Close</button>`:`<button data-a="report" data-i="${esc(post.id)}">Report</button><button data-a="block" data-i="${esc(post.id)}">Block</button>`}</div></div></article>`}).join(""):'<p class="mu">No requests match. Change your filters or post the first one!</p>';
+renderMySquads();renderTrending();renderSavedItems(playerMap);
+document.querySelectorAll("[data-a]").forEach(button=>button.onclick=()=>act(button.dataset.a,button.dataset.i));
+document.querySelectorAll("[data-saved-kind]").forEach(button=>button.onclick=()=>removeSaved(button.dataset.savedKind,button.dataset.savedId));
+}
+async function act(a,id){const p=posts.find(x=>x.id===id);if(!p)return;const profile=getProfile();
+try{if(a==="message"){
+if(authUser?.localOnly){location.href="messages.html?to="+encodeURIComponent(p.uid)+"&name="+encodeURIComponent(p.u);return}
+if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(p.uid)){toast("This player needs a registered account before direct messaging is available.");return}
+if(!authUser){location.href="login.html?next=messages.html&to="+encodeURIComponent(p.uid)+"&name="+encodeURIComponent(p.u);return}
+location.href="messages.html?to="+encodeURIComponent(p.uid)+"&name="+encodeURIComponent(p.u);return}
+if(a==="chat")return openRoom("post:"+id,p.m+" · "+p.u+"'s squad");
+if(a==="save-post")return saveRequest(id);
+if(a==="save-player")return savePlayer(p,profileForPost(p,new Map((authUser?.localOnly?window.SquadUpLocalAuth.getPlayers():[]).map(player=>[player.id,player]))));
+if(a==="edit"){if(p.uid!==uid)return toast("Only the host can edit this request");return editRequest(p)}
+if(a==="toggle-full"){if(p.uid!==uid)return toast("Only the host can change this request");const {id:postId,...data}=p;await S.set("posts",postId,{...data,closed:!p.closed,updatedAt:Date.now()});toast(p.closed?"Request reopened":"Request marked full");return}
+if(a==="report"){const blocked=ls.get("sq2_reports",[]);blocked.push({uid:p.uid,game:p.g,ts:Date.now()});ls.set("sq2_reports",blocked.slice(-50));addNotification("Local report saved for "+p.u+"'s request.","alert");return toast("Report saved here; it was not sent to SquadUp");}
+if(a==="block"){const blocked=ls.get("sq2_blocked",[]);const next=[...new Set([...blocked,p.uid])];ls.set("sq2_blocked",next);addNotification("You blocked "+p.u+". Their posts are hidden.","alert");return feed();}
+if(a==="close"){if(p.uid!==uid)return toast("Only the host can close this request");if(!window.confirm("Close this squad request? It will be removed from the list."))return;await S.del("posts",id);members.filter(m=>m.pid===id).forEach(m=>S.del("members",m.id));addNotification("Your request for "+p.g+" was closed.","success");return toast("Request closed")}
+const n=tag();if(!n)return;
+if(a==="join"){if(p.closed||spots(p)<1)return toast("This squad is not accepting new players");if(members.some(member=>member.pid===id&&member.uid===uid))return toast("You already joined this squad");await S.set("members",id+"_"+uid,{pid:id,uid,name:n,ts:Date.now(),game:p.g,platform:p.p,rank:profile.rank||"Gold",region:profile.region||"Anywhere"});await say("post:"+id,n+" joined the squad",true);addNotification("You joined "+p.g+" on "+p.p+".","success");openRoom("post:"+id,p.m+" · "+p.u+"'s squad")}
+if(a==="leave"){await S.del("members",id+"_"+uid);await say("post:"+id,n+" left the squad",true);addNotification("You left "+p.g+". Keep searching for your next squad.","alert");}
+}catch(e){toast("Couldn't save. You may have view-only access.")}}
+function openRoom(k,t){room=k;roomTitle=t;chat()}
+function chat(){$("rt").textContent=roomTitle;$("lobby").style.display=room.startsWith("lobby:")?"none":"";const pid=room.startsWith("post:")?room.slice(5):null;$("rm").textContent=pid?"Squad: "+(members.filter(m=>m.pid===pid).map(m=>m.name).join(", ")||"nobody yet"):"Local chat room · visible in this browser";const l=msgs.filter(m=>m.room===room);$("msgs").innerHTML=l.length?l.map(m=>m.sys?`<div class="m sys">${esc(m.text)}</div>`:`<div class="m ${m.uid===uid?"me":""}"><b>${esc(m.name)}</b>${esc(m.text)}</div>`).join(""):'<div class="m sys">No messages yet. Say hi!</div>';$("msgs").scrollTop=1e9}
+async function say(r,text,sys){const n=sys?"":tag();if(n===null)return;try{await S.set("messages",rid()+Date.now().toString(36),{room:r,uid,name:n,text,sys:!!sys,ts:Date.now()})}catch(e){toast("Couldn't send. You may have view-only access.")}}
+function modes(){$("fm").innerHTML=GAMES[$("fg").value].m.map(m=>`<option>${m}</option>`).join("")}
+$("fg").innerHTML=Object.keys(GAMES).map(g=>`<option>${esc(g)}</option>`).join("");
+$("gameFilter").innerHTML='<option value="">All games</option>'+Object.keys(GAMES).map(g=>`<option value="${esc(g)}">${esc(g)}</option>`).join("");
+$("fg").onchange=modes;modes();
+$("fwhen").min=new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16);
+const tiles=$("tiles");
+tiles.querySelectorAll(".tile").forEach(tile=>{tile.tabIndex=0;tile.setAttribute("role","button");tile.setAttribute("aria-pressed","false")});
+function renderGamePlayers(gameName){
+const panel=$("gamePlayers"),list=$("gamePlayerList");
+const players=window.SquadUpLocalAuth.getPlayersByGame(gameName),currentAccount=window.SquadUpLocalAuth.getSession();
+$("gamePlayersTitle").textContent=`Players who play ${gameName} · ${players.length}`;
+list.innerHTML=players.length?players.map(player=>{
+const avatar=safeAvatar(player.avatar),messageTarget=currentAccount?"messages.html":"login.html?next=messages.html";
+const messageUrl=new URL(messageTarget,location.href);
+messageUrl.searchParams.set("to",player.id);messageUrl.searchParams.set("name",player.gamer_tag);
+return`<article class="game-player">${avatar?`<img class="game-player-avatar" src="${esc(avatar)}" alt="">`:`<div class="game-player-avatar" aria-hidden="true">${esc(player.gamer_tag.slice(0,2).toUpperCase())}</div>`}<div class="game-player-info"><strong>${esc(player.gamer_tag)}</strong><small>${esc([player.platform,player.rank,player.region||"Anywhere",player.mic].filter(Boolean).join(" · "))}</small>${player.bio?`<p class="game-player-bio">${esc(player.bio)}</p>`:""}</div><a class="game-player-message" href="${esc(messageUrl.href)}">${currentAccount?"Message":"Log in to message"}</a></article>`;
+}).join(""):`<p class="mu">No other local players have added ${esc(gameName)} to their profile yet. Player profiles in this demo are saved only in this browser.</p>`;
+panel.hidden=false;
+}
+function selectTile(tile){const wasSelected=tile.classList.contains("is-selected");
+tiles.querySelectorAll(".tile").forEach(item=>{item.classList.remove("is-selected");item.setAttribute("aria-pressed","false")});
+if(wasSelected){$("gamePlayers").hidden=true;return}
+tile.classList.add("is-selected");tile.setAttribute("aria-pressed","true");const gameName=tile.querySelector("b")?tile.querySelector("b").textContent.trim():"";if(gameName&&GAMES[gameName])renderGamePlayers(gameName)}
+tiles.addEventListener("click",e=>{const tile=e.target.closest(".tile");if(tile)selectTile(tile)});
+tiles.addEventListener("keydown",e=>{if(e.key!=="Enter"&&e.key!==" ")return;const tile=e.target.closest(".tile");if(tile){e.preventDefault();selectTile(tile)}});
+$("closeGamePlayers").onclick=()=>{$("gamePlayers").hidden=true;tiles.querySelectorAll(".tile").forEach(item=>{item.classList.remove("is-selected");item.setAttribute("aria-pressed","false")})};
+$("name").value=ls.get("sq2_name","");$("name").oninput=()=>{const n=$("name").value.trim();if(n)ls.set("sq2_name",n);if(!authUser?.localOnly)updateNameField();};$("name").onchange=()=>{if(!authUser?.localOnly)return;const profile=getProfile();profile.tag=$("name").value.trim()||profile.tag;try{saveProfile(profile);applyProfilePanel()}catch(e){toast("Could not save gamer tag: "+e.message);applyProfilePanel()}};
+$("saveProfile").onclick=async()=>{const profile=getProfile();profile.tag=$("profileTag").value.trim()||profile.tag;profile.platform=$("profilePlatform").value;profile.rank=$("profileRank").value;profile.region=$("profileRegion").value.trim()||"Any";profile.mic=$("profileMic").value;profile.skill=$("profileSkill").value;profile.bio=$("profileBio").value.trim();profile.favoriteGame=$("profileGame").value||profile.favoriteGame;try{await saveRemoteProfile(profile);saveProfile(profile)}catch(e){toast("Could not save your profile: "+e.message);return}$("name").value=profile.tag;ls.set("sq2_name",profile.tag);applyProfilePanel();toast("Profile saved");addNotification("Your profile is ready for better squad matches.","success");};
+$("favoriteCurrent").onclick=()=>{const game=$("profileGame").value||document.querySelector(".tile.is-selected")?.querySelector("b")?.textContent.trim();if(!game){toast("Choose a favorite game first");return}const profile=getProfile();profile.favoriteGame=game;saveProfile(profile);saveRemoteProfile(profile).catch(e=>toast("Could not update your public profile: "+e.message));applyProfilePanel();toast("Favorite game set to "+game);};
+$("post").onclick=async()=>{
+try{
+const n=tag();if(!n)return;
+const when=$("fwhen").value;
+if(when&&(!Number.isFinite(Date.parse(when))||Date.parse(when)<=Date.now()))return toast("Choose a future session time or leave it blank.");
+const profile=getProfile(),data={g:$("fg").value,m:$("fm").value,p:$("fp").value,need:+$("fn").value,r:$("fr").value.trim(),mic:$("fmic").value,t:$("ft").value.trim(),when,u:n,uid,rank:profile.rank||"Gold",skill:profile.skill||"Casual",favoriteGame:profile.favoriteGame||"",playerPlatform:profile.platform||"",region:profile.region||"",avatar:safeAvatar(profile.avatar||""),bio:profile.bio||""};
+if(editingPostId){
+const existing=posts.find(post=>String(post.id)===editingPostId);
+if(!existing||existing.uid!==uid)return toast("Only the host can edit this request.");
+const {id:postId,...previous}=existing;
+await S.set("posts",postId,{...previous,...data,ts:existing.ts,updatedAt:Date.now()});
+addNotification("Your "+data.g+" request was updated.","success");toast("Request updated");
+}else{
+await S.set("posts",rid(),{...data,closed:false,ts:Date.now()});
+addNotification("Your request for "+data.g+" was saved in this browser.","success");toast("Request posted");
+}
+cancelEdit();
+}catch(error){toast("Couldn't save the request: "+(error.message||"browser storage may be unavailable."))}
+};
+$("cancelEdit").onclick=cancelEdit;
+$("sb").onclick=async()=>{const v=$("mi").value.trim();if(!v)return;$("mi").value="";await say(room,v)};
+$("mi").onkeydown=e=>{if(e.key==="Enter")$("sb").onclick()};
+$("lobby").onclick=()=>openRoom("lobby:All","Demo lobby");
+$("q").oninput=feed;$("pf").onchange=feed;$("gameFilter").onchange=feed;$("rankFilter").onchange=feed;$("micFilter").onchange=feed;$("regionFilter").oninput=feed;$("sortRequests").onchange=feed;$("openOnly").onchange=feed;$("savedOnly").onchange=feed;
+applyProfilePanel();chat();feed();renderNotifications();renderMySquads();renderTrending();init();
+</script>
+    </body>
+</html>
